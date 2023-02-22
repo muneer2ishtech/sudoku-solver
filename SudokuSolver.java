@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 /**
  * @author Muneer Ahmed Syed
- * @version 0.7
+ * @version 0.8
  * This class solves Sodoku puzzle
  * TODO: improve code quality of double box & row and double box & col combination
  * (functionally fine, too much repeated lines of code)
@@ -55,11 +55,14 @@ public class SudokuSolver {
 		System.err.println("Invalid input for file name");
 			System.exit(5);
 		}
-		sudokuSolver.readInputFromFile(inputFileName);
-		
-		sudokuSolver.solve();
+		solveFile(sudokuSolver, inputFileName);
 
 	}
+
+    private static void solveFile(SudokuSolver sudokuSolver, String inputFileName) {
+        sudokuSolver.readInputFromFile(inputFileName);
+		sudokuSolver.solve(true);
+    }
 
 	@SuppressWarnings("unchecked")
 	private void init() {
@@ -121,7 +124,8 @@ public class SudokuSolver {
 			printPuzzle();
 
 			if (! isValid()) {
-				exitAsInvalid();
+				//exitAsInvalid();
+				throw new RuntimeException("Invalid Input");
 			}
 
 		} catch (NumberFormatException e) {
@@ -138,11 +142,31 @@ public class SudokuSolver {
 		}
 	}
 
-	public void solve() {
+    private void readInputFromStrArray(String[][] input) {
+        for (int i=0; i<9; i++) {
+            for (int j=0; j<9; j++) {
+                if (! input[i][j].trim().isEmpty()) {
+                    a[i][j] = Integer.parseInt(input[i][j].trim());
+                }
+            }
+        }
+		if (! isValid()) {
+			throw new RuntimeException("Invalid Input");
+		}
+
+    }
+
+	public int[][] solve(String[][] input) {
+	    readInputFromStrArray(input);
+	    solve(false);
+	    return a;
+	}
+
+	private void solve(boolean exitOnSolved) {
 		resetProbables();
 
 		do {
-			solveUniqs();
+			solveUniqs(exitOnSolved);
 
 			for (int i=0; i<9; i+=3) {
 				for (int j=0; j<9; j+=3) {
@@ -189,7 +213,7 @@ public class SudokuSolver {
 				solveByDoubleBoxCol(k);
 			}
 
-		} while(! isResolved());
+		} while(! isResolved(exitOnSolved));
 	}
 
 	private void exitSuccess() {
@@ -213,11 +237,12 @@ public class SudokuSolver {
 		if (tryc == MAX_TRY) {
 			System.err.println("Tried and failed after " + tryc + " iterations");
 			print();
-			System.exit(3);
+			//System.exit(3);
+			throw new RuntimeException("Tried and failed after " + tryc + " iterations");
 		}
 	}
 
-	private boolean isResolved() {
+	private boolean isResolved(boolean exitOnSolved) {
 		//print();
 		for (int i=0; i<9; i++) {
 			for (int j=0; j<9; j++) {
@@ -230,10 +255,17 @@ public class SudokuSolver {
 		}
 
 		if (! isValid()) {
-			exitAsInvalid();
+			throw new RuntimeException("Invalid solution");
+			/*
+		    if (exitOnSolved) {
+		        exitAsInvalid();
+		    }
+		    */
 		}
 
-		exitSuccess();
+		if (exitOnSolved) {
+		    exitSuccess();
+		}
 		
 		return true;
 	}
@@ -335,7 +367,7 @@ public class SudokuSolver {
 		return false;
 	}
 	
-	private void solveUniqs() {
+	private void solveUniqs(boolean exitOnSolved) {
 		for (int i=0; i<9; i++) {
 			solveUniqInRow(i);
 		}
@@ -350,7 +382,7 @@ public class SudokuSolver {
 			}
 		}
 
-		isResolved();
+		isResolved(exitOnSolved);
 	}
 
 	private void solveUniqProbable(int row, int col) {
@@ -1318,7 +1350,8 @@ public class SudokuSolver {
 		printPuzzle();
 
 		if (! isValid()) {
-			exitAsInvalid();
+			//exitAsInvalid();
+			throw new RuntimeException("Test failed");
 		}
 	}
 
