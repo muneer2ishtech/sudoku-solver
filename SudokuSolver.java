@@ -7,13 +7,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeSet;
 
 /**
  * @author Muneer Ahmed Syed
- * @version 0.6
+ * @version 0.7
  * This class solves Sodoku puzzle
- * TODO: to process double box & row and double box & col combination
+ * TODO: improve code quality of double box & row and double box & col combination
+ * (functionally fine, too much repeated lines of code)
  * TODO: any other ways of elimination (refer www.extremesudoku.info)
  * TODO: to try randomization if puzzle is not getting solved after too many iterations
  * TODO: optimize performance
@@ -24,7 +26,7 @@ public class SudokuSolver {
 	private TreeSet<Integer> p[][];
 	//private int counter = 0;
 	private int tryc = 0;
-	private static final int MAX_TRY = 100;
+	private static final int MAX_TRY = 5000;
 
 	private static final Integer N1 = 1;
 	private static final Integer N2 = 2;
@@ -38,11 +40,13 @@ public class SudokuSolver {
 
 	public SudokuSolver() {
 		init();
-		//setKnownValues();
+		//setTestKnownValues();
 	}
 
 	public static void main(String[] args) {
 		SudokuSolver sudokuSolver = new SudokuSolver();
+		//sudokuSolver.setTestProbables();
+
 		String inputFileName = null;
 		if (args.length != 0) {
 			inputFileName = args[0];
@@ -52,6 +56,7 @@ public class SudokuSolver {
 			System.exit(5);
 		}
 		sudokuSolver.readInputFromFile(inputFileName);
+		
 		sudokuSolver.solve();
 
 	}
@@ -146,22 +151,42 @@ public class SudokuSolver {
 			}
 			for (int i=0; i<9; i++) {
 				solveDoubleProbableInRow(i);
+				solveUniqInRow(i);
+		
 				solveDoubleProbableInRowReverse(i);
+				solveUniqInRow(i);
+		
 				solveTripleProbableInRow(i);
+				solveUniqInRow(i);
 			}
 			for (int j=0; j<9; j++) {
 				solveDoubleProbableInCol(j);
-				solveDoubleProbableInColReverse(j);
-				solveTripleProbableInCol(j);
+				solveUniqInCol(j);
 				
+				solveDoubleProbableInColReverse(j);
+				solveUniqInCol(j);
+				
+				solveTripleProbableInCol(j);
+				solveUniqInCol(j);
 			}
 			for (int i=0; i<9; i+=3) {
 				for (int j=0; j<9; j+=3) {
 					solveByBoxRowAndBoxCol(i, j);
+					solveUniqInBox(i, j);
+					
 					solveDoubleProbableInBox(i, j);
+					solveUniqInBox(i, j);
+					
 					solveDoubleProbableInBoxReverse(i, j);
+					solveUniqInBox(i, j);
+					
 					solveTripleProbableInBox(i, j);
+					solveUniqInBox(i, j);
 				}
+			}
+			for (int k=0; k<9; k+=3) {
+				solveByDoubleBoxRow(k);
+				solveByDoubleBoxCol(k);
 			}
 
 		} while(! isResolved());
@@ -312,31 +337,16 @@ public class SudokuSolver {
 	
 	private void solveUniqs() {
 		for (int i=0; i<9; i++) {
-			solveUniqProbableInRow(i);
-			solveUniqProbableInRowReverse(i);
-
-			if (isRowInvalid(i)) {
-				exitAsInvalid();
-			}
+			solveUniqInRow(i);
 		}
 
 		for (int j=0; j<9; j++) {
-			solveUniqProbableInCol(j);
-			solveUniqProbableInColReverse(j);
-
-			if (isColInvalid(j)) {
-				exitAsInvalid();
-			}
+			solveUniqInCol(j);
 		}
 
 		for (int boxI=0; boxI<9; boxI+=3) {
 			for (int boxJ=0; boxJ<9; boxJ+=3) {
-				solveUniqProbableInBox(boxI, boxJ);
-				solveUniqProbableInBoxReverse(boxI, boxJ);
-
-				if (isBoxInvalid(boxI, boxJ)) {
-					exitAsInvalid();
-				}
+				solveUniqInBox(boxI, boxJ);
 			}
 		}
 
@@ -350,6 +360,15 @@ public class SudokuSolver {
 			} else {
 				resetProbables(row, col);
 			}
+		}
+	}
+
+	private void solveUniqInRow(int row) {
+		solveUniqProbableInRow(row);
+		solveUniqProbableInRowReverse(row);
+
+		if (isRowInvalid(row)) {
+			exitAsInvalid();
 		}
 	}
 
@@ -376,6 +395,15 @@ public class SudokuSolver {
 		}
 	}
 
+	private void solveUniqInCol(int col) {
+		solveUniqProbableInCol(col);
+		solveUniqProbableInColReverse(col);
+
+		if (isColInvalid(col)) {
+			exitAsInvalid();
+		}
+	}
+
 	private void solveUniqProbableInCol(int col) {
 		for (int i=0; i<9; i++) {
 			solveUniqProbable(i, col);
@@ -396,6 +424,15 @@ public class SudokuSolver {
 				// n is present only once
 				setSolvedValue(foundRow, col, n);
 			}
+		}
+	}
+
+	private void solveUniqInBox(int row, int col) {
+		solveUniqProbableInBox(row, col);
+		solveUniqProbableInBoxReverse(row, col);
+
+		if (isBoxInvalid(row, col)) {
+			exitAsInvalid();
 		}
 	}
 
@@ -450,7 +487,7 @@ public class SudokuSolver {
 	private void resetProbables(int row, int col) {
 		if (a[row][col] == 0) {
 			if (p[row][col] == null || p[row][col].size() == 0) {
-				initProbables(row, col);
+				//initProbables(row, col); // deliberately done to catch errors
 			}
 		} else {
 			p[row][col].clear();
@@ -950,7 +987,7 @@ public class SudokuSolver {
 
 		List<Integer> boxP = new ArrayList<Integer>(boxPSet);
 		for (int k=0; k<boxP.size(); k++) {
-			int pr = boxP.get(k);
+			Integer pr = boxP.get(k);
 			int foundRow = 10;
 			int countRow = 0;
 			for (int i=boxI; i<(boxI+3); i++) {
@@ -985,6 +1022,155 @@ public class SudokuSolver {
 				//printProbables();
 			}
 
+		}
+	}
+
+	private void solveByDoubleBoxRow(int row) {
+		//printProbables();
+		// first find all probable of box
+		TreeSet<Integer> boxPSet = new TreeSet<Integer>();
+		int boxI = (row / 3) * 3;
+		Integer rows[] = new Integer[3];
+
+		for (int i=boxI; i<(boxI+3); i++) {
+			rows[i%3] = i;
+			for (int j=0; j<9; j++) {
+				boxPSet.addAll(p[i][j]);
+			}
+		}
+
+		List<Integer> boxP = new ArrayList<Integer>(boxPSet);
+		for (int k=0; k<boxP.size(); k++) {
+			Integer pr = boxP.get(k);
+
+			Integer boxFoundRow[][] = new Integer[3][3];
+
+			for (int boxJ=0; boxJ<3; boxJ++) {
+				for (int i=boxI; i<(boxI+3); i++) {
+					if (p[i][(3*boxJ)].contains(pr) || p[i][((3*boxJ)+1)].contains(pr) || p[i][((3*boxJ)+2)].contains(pr) ) {
+						boxFoundRow[i%3][boxJ] = i;
+					}
+				}
+			}
+
+			if (boxFoundRow[0][0] == boxFoundRow[1][0] && boxFoundRow[0][1] == boxFoundRow[1][1] && boxFoundRow[0][2] == boxFoundRow[1][2]) {
+				if (boxFoundRow[0][0] == null && boxFoundRow[0][1] != null && boxFoundRow[0][2] != null) {
+					eliminateRowBoxUnprobables(rows[1], 2, pr);
+					eliminateRowBoxUnprobables(rows[2], 2, pr);
+				} else if (boxFoundRow[0][0] != null && boxFoundRow[0][1] == null && boxFoundRow[0][2] != null) {
+					eliminateRowBoxUnprobables(rows[0], 2, pr);
+					eliminateRowBoxUnprobables(rows[2], 2, pr);
+				} else if (boxFoundRow[0][0] != null && boxFoundRow[0][1] != null && boxFoundRow[0][2] == null) {
+					eliminateRowBoxUnprobables(rows[0], 2, pr);
+					eliminateRowBoxUnprobables(rows[1], 2, pr);
+				}
+			} else if (boxFoundRow[2][0] == boxFoundRow[1][0] && boxFoundRow[2][1] == boxFoundRow[1][1] && boxFoundRow[2][2] == boxFoundRow[1][2]) {
+				if (boxFoundRow[2][0] == null && boxFoundRow[2][1] != null && boxFoundRow[2][2] != null) {
+					eliminateRowBoxUnprobables(rows[1], 0, pr);
+					eliminateRowBoxUnprobables(rows[2], 0, pr);
+				} else if (boxFoundRow[2][0] != null && boxFoundRow[2][1] == null && boxFoundRow[2][2] != null) {
+					eliminateRowBoxUnprobables(rows[0], 0, pr);
+					eliminateRowBoxUnprobables(rows[2], 0, pr);
+				} else if (boxFoundRow[2][0] != null && boxFoundRow[2][1] != null && boxFoundRow[2][2] == null) {
+					eliminateRowBoxUnprobables(rows[0], 0, pr);
+					eliminateRowBoxUnprobables(rows[1], 0, pr);
+				}
+			} else if (boxFoundRow[0][0] == boxFoundRow[2][0] && boxFoundRow[0][1] == boxFoundRow[2][1] && boxFoundRow[0][2] == boxFoundRow[2][2]) {
+				if (boxFoundRow[0][0] == null && boxFoundRow[0][1] != null && boxFoundRow[0][2] != null) {
+					eliminateRowBoxUnprobables(rows[1], 1, pr);
+					eliminateRowBoxUnprobables(rows[2], 1, pr);
+				} else if (boxFoundRow[0][0] != null && boxFoundRow[0][1] == null && boxFoundRow[0][2] != null) {
+					eliminateRowBoxUnprobables(rows[0], 1, pr);
+					eliminateRowBoxUnprobables(rows[2], 1, pr);
+				} else if (boxFoundRow[0][0] != null && boxFoundRow[0][1] != null && boxFoundRow[0][2] == null) {
+					eliminateRowBoxUnprobables(rows[0], 1, pr);
+					eliminateRowBoxUnprobables(rows[1], 1, pr);
+				}
+			}
+
+			//printProbables();
+		}
+		//printProbables();
+	}
+
+	private void eliminateRowBoxUnprobables(int row, int box, Integer pr) {
+		// remove pr from box2 row2
+		for (int j=(box*3); j<((box*3)+3); j++) {
+			p[row][j].remove(pr);
+		}
+	}
+
+	private void solveByDoubleBoxCol(int col) {
+		//printProbables();
+		// first find all probable of box
+		TreeSet<Integer> boxPSet = new TreeSet<Integer>();
+		int boxJ = (col / 3) * 3;
+		Integer cols[] = new Integer[3];
+
+		for (int j=boxJ; j<(boxJ+3); j++) {
+			cols[j%3] = j;
+			for (int i=0; i<9; i++) {
+				boxPSet.addAll(p[i][j]);
+			}
+		}
+
+		List<Integer> boxP = new ArrayList<Integer>(boxPSet);
+		for (int k=0; k<boxP.size(); k++) {
+			Integer pr = boxP.get(k);
+
+			Integer boxFoundCol[][] = new Integer[3][3];
+
+			for (int boxI=0; boxI<3; boxI++) {
+				for (int j=boxJ; j<(boxJ+3); j++) {
+					if (p[(3*boxI)][j].contains(pr) || p[((3*boxI)+1)][j].contains(pr) || p[((3*boxI)+2)][j].contains(pr) ) {
+						boxFoundCol[boxI][j%3] = j;
+					}
+				}
+			}
+
+			if (boxFoundCol[0][0] == boxFoundCol[1][0] && boxFoundCol[0][1] == boxFoundCol[1][1] && boxFoundCol[0][2] == boxFoundCol[1][2]) {
+				if (boxFoundCol[0][0] == null && boxFoundCol[0][1] != null && boxFoundCol[0][2] != null) {
+					eliminateColBoxUnprobables(cols[1], 2, pr);
+					eliminateColBoxUnprobables(cols[2], 2, pr);
+				} else if (boxFoundCol[0][0] != null && boxFoundCol[0][1] == null && boxFoundCol[0][2] != null) {
+					eliminateColBoxUnprobables(cols[0], 2, pr);
+					eliminateColBoxUnprobables(cols[2], 2, pr);
+				} else if (boxFoundCol[0][0] != null && boxFoundCol[0][1] != null && boxFoundCol[0][2] == null) {
+					eliminateColBoxUnprobables(cols[0], 2, pr);
+					eliminateColBoxUnprobables(cols[1], 2, pr);
+				}
+			} else if (boxFoundCol[2][0] == boxFoundCol[1][0] && boxFoundCol[2][1] == boxFoundCol[1][1] && boxFoundCol[2][2] == boxFoundCol[1][2]) {
+				if (boxFoundCol[2][0] == null && boxFoundCol[2][1] != null && boxFoundCol[2][2] != null) {
+					eliminateColBoxUnprobables(cols[1], 0, pr);
+					eliminateColBoxUnprobables(cols[2], 0, pr);
+				} else if (boxFoundCol[2][0] != null && boxFoundCol[2][1] == null && boxFoundCol[2][2] != null) {
+					eliminateColBoxUnprobables(cols[0], 0, pr);
+					eliminateColBoxUnprobables(cols[2], 0, pr);
+				} else if (boxFoundCol[2][0] != null && boxFoundCol[2][1] != null && boxFoundCol[2][2] == null) {
+					eliminateColBoxUnprobables(cols[0], 0, pr);
+					eliminateColBoxUnprobables(cols[1], 0, pr);
+				}
+			} else if (boxFoundCol[0][0] == boxFoundCol[2][0] && boxFoundCol[0][1] == boxFoundCol[2][1] && boxFoundCol[0][2] == boxFoundCol[2][2]) {
+				if (boxFoundCol[0][0] == null && boxFoundCol[0][1] != null && boxFoundCol[0][2] != null) {
+					eliminateColBoxUnprobables(cols[1], 1, pr);
+					eliminateColBoxUnprobables(cols[2], 1, pr);
+				} else if (boxFoundCol[0][0] != null && boxFoundCol[0][1] == null && boxFoundCol[0][2] != null) {
+					eliminateColBoxUnprobables(cols[0], 1, pr);
+					eliminateColBoxUnprobables(cols[2], 1, pr);
+				} else if (boxFoundCol[0][0] != null && boxFoundCol[0][1] != null && boxFoundCol[0][2] == null) {
+					eliminateColBoxUnprobables(cols[0], 1, pr);
+					eliminateColBoxUnprobables(cols[1], 1, pr);
+				}
+			}
+			//printProbables();
+		}
+		//printProbables();
+	}
+
+	private void eliminateColBoxUnprobables(int col, int box, Integer pr) {
+		// remove pr from box2 row2
+		for (int i=(box*3); i<((box*3)+3); i++) {
+			p[i][col].remove(pr);
 		}
 	}
 
@@ -1037,7 +1223,8 @@ public class SudokuSolver {
 		System.err.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + l + "]");		
 	}
 
-	public void setKnownValues() {
+	@SuppressWarnings("unused")
+	private void setTestKnownValues() {
 		//	a[0][0] = 0;
 		//	a[0][1] = 0;
 			a[0][2] = 3;
@@ -1133,5 +1320,111 @@ public class SudokuSolver {
 		if (! isValid()) {
 			exitAsInvalid();
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private void setTestProbables() {
+		Integer p00[] = {3,4,7,8,9};	Integer p01[] = {3,4,7,9};	Integer p02[] = {};	Integer p03[] = {2,4,7,9};	Integer p04[] = {2,3,4,5,9};	Integer p05[] = {2,3,5,7,9};	Integer p06[] = {};	Integer p07[] = {4,8,9};	Integer p08[] = {4,5,7,8};	
+		Integer p10[] = {4,7,9};	Integer p11[] = {};	Integer p12[] = {7,9};	Integer p13[] = {};	Integer p14[] = {4,5,6,9};	Integer p15[] = {};	Integer p16[] = {4,5,6,9};	Integer p17[] = {};	Integer p18[] = {4,5,6};
+		Integer p20[] = {};	Integer p21[] = {3,4,7,9};	Integer p22[] = {7,8,9};	Integer p23[] = {4,6,7,9};	Integer p24[] = {3,4,6,9};	Integer p25[] = {3,7,9};	Integer p26[] = {4,6,7,8,9};	Integer p27[] = {4,6,8,9};	Integer p28[] = {};	
+		Integer p30[] = {8,9};	Integer p31[] = {};	Integer p32[] = {5,8,9};	Integer p33[] = {};	Integer p34[] = {2,5,6,9};	Integer p35[] = {};	Integer p36[] = {2,6,8,9};	Integer p37[] = {};	Integer p38[] = {6,8};
+		Integer p40[] = {3,4,8,9};	Integer p41[] = {3,4,5,9};	Integer p42[] = {3,5,8,9};	Integer p43[] = {2,6,9};	Integer p44[] = {};	Integer p45[] = {2,5,9};	Integer p46[] = {2,4,6,8,9};	Integer p47[] = {1,4,6,8,9};	Integer p48[] = {1,3,4,6,8};	
+		Integer p50[] = {3,4,7,9};	Integer p51[] = {};	Integer p52[] = {3,7,9};	Integer p53[] = {};	Integer p54[] = {2,9};	Integer p55[] = {};	Integer p56[] = {2,4,9};	Integer p57[] = {};	Integer p58[] = {3,4};
+		Integer p60[] = {};	Integer p61[] = {3,5,7};	Integer p62[] = {5,7};	Integer p63[] = {4,7};	Integer p64[] = {1,34,8};	Integer p65[] = {3,7};	Integer p66[] = {45678};	Integer p67[] = {1,4,6,8};	Integer p68[] = {};	
+		Integer p70[] = {3,7,9};	Integer p71[] = {};	Integer p72[] = {7,9};	Integer p73[] = {};	Integer p74[] = {1,3,4,9};	Integer p75[] = {};	Integer p76[] = {4,7};	Integer p77[] = {};	Integer p78[] = {1,4,7};
+		Integer p80[] = {6,7,9};	Integer p81[] = {5,7,9};	Integer p82[] = {};	Integer p83[] = {2,7,9};	Integer p84[] = {1,2,8,9};	Integer p85[] = {2,7,9};	Integer p86[] = {};	Integer p87[] = {1,6,8};	Integer p88[] = {1,5,6,7,8};
+	
+		p[0][0] = new TreeSet<Integer>(Arrays.asList(p00));
+		p[0][1] = new TreeSet<Integer>(Arrays.asList(p01));
+		p[0][2] = new TreeSet<Integer>(Arrays.asList(p02));
+		p[0][3] = new TreeSet<Integer>(Arrays.asList(p03));
+		p[0][4] = new TreeSet<Integer>(Arrays.asList(p04));
+		p[0][5] = new TreeSet<Integer>(Arrays.asList(p05));
+		p[0][6] = new TreeSet<Integer>(Arrays.asList(p06));
+		p[0][7] = new TreeSet<Integer>(Arrays.asList(p07));
+		p[0][8] = new TreeSet<Integer>(Arrays.asList(p08));
+
+		p[1][0] = new TreeSet<Integer>(Arrays.asList(p10));
+		p[1][1] = new TreeSet<Integer>(Arrays.asList(p11));
+		p[1][2] = new TreeSet<Integer>(Arrays.asList(p12));
+		p[1][3] = new TreeSet<Integer>(Arrays.asList(p13));
+		p[1][4] = new TreeSet<Integer>(Arrays.asList(p14));
+		p[1][5] = new TreeSet<Integer>(Arrays.asList(p15));
+		p[1][6] = new TreeSet<Integer>(Arrays.asList(p16));
+		p[1][7] = new TreeSet<Integer>(Arrays.asList(p17));
+		p[1][8] = new TreeSet<Integer>(Arrays.asList(p18));
+
+		p[2][0] = new TreeSet<Integer>(Arrays.asList(p20));
+		p[2][1] = new TreeSet<Integer>(Arrays.asList(p21));
+		p[2][2] = new TreeSet<Integer>(Arrays.asList(p22));
+		p[2][3] = new TreeSet<Integer>(Arrays.asList(p23));
+		p[2][4] = new TreeSet<Integer>(Arrays.asList(p24));
+		p[2][5] = new TreeSet<Integer>(Arrays.asList(p25));
+		p[2][6] = new TreeSet<Integer>(Arrays.asList(p26));
+		p[2][7] = new TreeSet<Integer>(Arrays.asList(p27));
+		p[2][8] = new TreeSet<Integer>(Arrays.asList(p28));
+
+		p[3][0] = new TreeSet<Integer>(Arrays.asList(p30));
+		p[3][1] = new TreeSet<Integer>(Arrays.asList(p31));
+		p[3][2] = new TreeSet<Integer>(Arrays.asList(p32));
+		p[3][3] = new TreeSet<Integer>(Arrays.asList(p33));
+		p[3][4] = new TreeSet<Integer>(Arrays.asList(p34));
+		p[3][5] = new TreeSet<Integer>(Arrays.asList(p35));
+		p[3][6] = new TreeSet<Integer>(Arrays.asList(p36));
+		p[3][7] = new TreeSet<Integer>(Arrays.asList(p37));
+		p[3][8] = new TreeSet<Integer>(Arrays.asList(p38));
+
+		p[4][0] = new TreeSet<Integer>(Arrays.asList(p40));
+		p[4][1] = new TreeSet<Integer>(Arrays.asList(p41));
+		p[4][2] = new TreeSet<Integer>(Arrays.asList(p42));
+		p[4][3] = new TreeSet<Integer>(Arrays.asList(p43));
+		p[4][4] = new TreeSet<Integer>(Arrays.asList(p44));
+		p[4][5] = new TreeSet<Integer>(Arrays.asList(p45));
+		p[4][6] = new TreeSet<Integer>(Arrays.asList(p46));
+		p[4][7] = new TreeSet<Integer>(Arrays.asList(p47));
+		p[4][8] = new TreeSet<Integer>(Arrays.asList(p48));
+
+		p[5][0] = new TreeSet<Integer>(Arrays.asList(p50));
+		p[5][1] = new TreeSet<Integer>(Arrays.asList(p51));
+		p[5][2] = new TreeSet<Integer>(Arrays.asList(p52));
+		p[5][3] = new TreeSet<Integer>(Arrays.asList(p53));
+		p[5][4] = new TreeSet<Integer>(Arrays.asList(p54));
+		p[5][5] = new TreeSet<Integer>(Arrays.asList(p55));
+		p[5][6] = new TreeSet<Integer>(Arrays.asList(p56));
+		p[5][7] = new TreeSet<Integer>(Arrays.asList(p57));
+		p[5][8] = new TreeSet<Integer>(Arrays.asList(p58));
+
+		p[6][0] = new TreeSet<Integer>(Arrays.asList(p60));
+		p[6][1] = new TreeSet<Integer>(Arrays.asList(p61));
+		p[6][2] = new TreeSet<Integer>(Arrays.asList(p62));
+		p[6][3] = new TreeSet<Integer>(Arrays.asList(p63));
+		p[6][4] = new TreeSet<Integer>(Arrays.asList(p64));
+		p[6][5] = new TreeSet<Integer>(Arrays.asList(p65));
+		p[6][6] = new TreeSet<Integer>(Arrays.asList(p66));
+		p[6][7] = new TreeSet<Integer>(Arrays.asList(p67));
+		p[6][8] = new TreeSet<Integer>(Arrays.asList(p68));
+
+		p[7][0] = new TreeSet<Integer>(Arrays.asList(p70));
+		p[7][1] = new TreeSet<Integer>(Arrays.asList(p71));
+		p[7][2] = new TreeSet<Integer>(Arrays.asList(p72));
+		p[7][3] = new TreeSet<Integer>(Arrays.asList(p73));
+		p[7][4] = new TreeSet<Integer>(Arrays.asList(p74));
+		p[7][5] = new TreeSet<Integer>(Arrays.asList(p75));
+		p[7][6] = new TreeSet<Integer>(Arrays.asList(p76));
+		p[7][7] = new TreeSet<Integer>(Arrays.asList(p77));
+		p[7][8] = new TreeSet<Integer>(Arrays.asList(p78));
+
+		p[8][0] = new TreeSet<Integer>(Arrays.asList(p80));
+		p[8][1] = new TreeSet<Integer>(Arrays.asList(p81));
+		p[8][2] = new TreeSet<Integer>(Arrays.asList(p82));
+		p[8][3] = new TreeSet<Integer>(Arrays.asList(p83));
+		p[8][4] = new TreeSet<Integer>(Arrays.asList(p84));
+		p[8][5] = new TreeSet<Integer>(Arrays.asList(p85));
+		p[8][6] = new TreeSet<Integer>(Arrays.asList(p86));
+		p[8][7] = new TreeSet<Integer>(Arrays.asList(p87));
+		p[8][8] = new TreeSet<Integer>(Arrays.asList(p88));
+
+		printProbables();
+		
 	}
 }
