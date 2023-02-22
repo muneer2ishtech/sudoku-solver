@@ -4,9 +4,8 @@ import java.util.TreeSet;
 
 /**
  * @author Muneer Ahmed Syed
- * @version 0.2
+ * @version 0.3
  * This class solves Sodoku puzzle
- * TODO: to process two probable in reverse
  * TODO: to process three probable
  * TODO: to try randomization if puzzle is not getting solved after too many iterations
  * TODO: optimize performance
@@ -69,30 +68,21 @@ public class SudokuSolver {
 		resetProbables();
 
 		do {
+			solveUniqs();
+
 			for(int i=0; i<9; i++) {
-				solveUniqProbableInRow(i);
-				for(int j=0; j<9; j++) {
-					System.out.println("****************** i=" + i + " j=" + j);
-
-					solveUniqProbable(i, j);
-
-					solveUniqProbableInCol(j);
-					solveUniqProbableInBox(i, j);
-
-					solveDoubleProbableInCol(j);
-					solveDoubleProbableInBox(i, j);
-
-					solveUniqProbable(i, j);
-
-					if(a[i][j] != 0) {
-						resetProbables(i, j);
-					}
-
-					isResolved();
-				}
-
 				solveDoubleProbableInRow(i);
-
+				solveDoubleProbableInRowReverse(i);
+			}
+			for(int j=0; j<9; j++) {
+				solveDoubleProbableInCol(j);
+				//solveDoubleProbableInColReverse(j);
+			}
+			for(int i=0; i<9; i+=3) {
+				for(int j=0; j<9; j+=3) {
+					solveDoubleProbableInBox(i, j);
+					//solveDoubleProbableInBoxReverse(i, j);
+				}
 			}
 
 			exitAfterMaxTry();
@@ -106,28 +96,39 @@ public class SudokuSolver {
 		System.exit(0);
 	}
 
+	private void exitAsInvalid() {
+		print();
+		System.exit(2);
+	}
+
 	private void exitAfterMaxTry() {
 		tryc ++;
 		int maxTry = 1000;
 		//resetProbables();
-		if (tryc % maxTry == 0 ) {
+		if (tryc % 100 == 0 ) {
+			System.out.println("Tried " + tryc + " iterations");
+			print();
+		}
+		if (tryc == maxTry) {
 			System.out.println("Tried and failed after " + tryc + " iterations");
-			printProbables();
+			print();
 			System.exit(3);
 		}
 	}
 
 	private boolean isResolved() {
+		//print();
 		for(int i=0; i<9; i++) {
 			for(int j=0; j<9; j++) {
 				if(a[i][j] == 0) {
+					//resetProbables(i, j);
 					return false;
 				}
 			}
 		}
 
 		if (! isValid()) {
-			System.exit(2);
+			exitAsInvalid();
 		}
 
 		exitSuccess();
@@ -152,51 +153,77 @@ public class SudokuSolver {
 	private boolean isRowInvalid() {
 		// validate row
 		for (int i=0; i<9; i++) {
-			for (int j=0; j<9; j++) {
-				for (int k=0; k<9; k++) {
-					if (j != k && a[i][j] != 0 && a[i][j] == a[i][k]) {
-						// duplicate found
-						System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + i + "][" + k + "]");
-						return true;
-					}
+			if (isRowInvalid(i)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isRowInvalid(int row) {
+		// validate row
+		for (int j=0; j<9; j++) {
+			for (int k=0; k<9; k++) {
+				if (j != k && a[row][j] != 0 && a[row][j] == a[row][k]) {
+					// duplicate found
+					System.out.println("Duplicate value " + a[row][j] + " found for a[" + row + "][" + j + "] & a[" + row + "][" + k + "]");
+					return true;
 				}
-				
 			}
 		}
 		return false;
 	}
 
 	private boolean isColInvalid() {
-		// validate row
+		// validate col
 		for (int j=0; j<9; j++) {
-			for (int i=0; i<9; i++) {
-				for (int k=0; k<9; k++) {
-					if (i != k &&  a[i][j] != 0 && a[i][j] == a[k][j]) {
-						// duplicate found
-						System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + j + "]");
-						return true;
-					}
+			if (isColInvalid(j)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isColInvalid(int col) {
+		// validate col
+		for (int i=0; i<9; i++) {
+			for (int k=0; k<9; k++) {
+				if (i != k &&  a[i][col] != 0 && a[i][col] == a[k][col]) {
+					// duplicate found
+					System.out.println("Duplicate value " + a[i][col] + " found for a[" + i + "][" + col + "] & a[" + k + "][" + col + "]");
+					return true;
 				}
-				
 			}
 		}
 		return false;
 	}
 
 	private boolean isBoxInvalid() {
-		// validate row
+		// validate box
 		for (int boxI=0; boxI<9; boxI+=3) {
 			for (int boxJ=0; boxJ<9; boxJ+=3) {
-				for (int i=boxI; i<boxI+3; i++) {
-					for (int j=boxJ; j<boxJ+3; j++) {
-						for (int k=boxI; k<boxI+3; k++) {
-							for (int l=boxJ; l<boxJ+3; l++) {
-								if (i != k && j != l  && a[i][j] != 0 && a[i][j] == a[k][l]) {
-									// duplicate found
-									System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + l + "]");
-									return true;
-								}
-							}
+				if (isBoxInvalid(boxI, boxJ)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isBoxInvalid(int row, int col) {
+		// validate box
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
+				for (int k=boxI; k<(boxI+3); k++) {
+					for (int l=boxJ; l<(boxJ+3); l++) {
+						if (i != k && j != l  && a[i][j] != 0 && a[i][j] == a[k][l]) {
+							// duplicate found
+							System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + l + "]");
+							return true;
 						}
 					}
 				}
@@ -205,8 +232,57 @@ public class SudokuSolver {
 
 		return false;
 	}
+	
+	private void solveUniqs() {
+		for(int i=0; i<9; i++) {
+			solveUniqProbableInRow(i);
+			solveUniqProbableInRowReverse(i);
+
+			if (isRowInvalid(i)) {
+				exitAsInvalid();
+			}
+		}
+
+		for(int j=0; j<9; j++) {
+			solveUniqProbableInCol(j);
+			solveUniqProbableInColReverse(j);
+
+			if (isColInvalid(j)) {
+				exitAsInvalid();
+			}
+		}
+
+		for (int boxI=0; boxI<9; boxI+=3) {
+			for (int boxJ=0; boxJ<9; boxJ+=3) {
+				solveUniqProbableInBox(boxI, boxJ);
+				solveUniqProbableInBoxReverse(boxI, boxJ);
+
+				if (isBoxInvalid(boxI, boxJ)) {
+					exitAsInvalid();
+				}
+			}
+		}
+
+		isResolved();
+	}
+
+	private void solveUniqProbable(int row, int col) {
+		if(a[row][col] == 0) {
+			if (p[row][col].size() == 1 ) {
+				setSolvedValue(row, col, p[row][col].first().intValue());
+			} else {
+				resetProbables(row, col);
+			}
+		}
+	}
 
 	private void solveUniqProbableInRow(int row) {
+		for(int j=0; j<9; j++) {
+			solveUniqProbable(row, j);
+		}
+	}
+
+	private void solveUniqProbableInRowReverse(int row) {
 		for (int n=1; n<=9; n++) {
 			int counter = 0;
 			int foundCol = 10;
@@ -223,13 +299,13 @@ public class SudokuSolver {
 		}
 	}
 
-	private void solveUniqProbable(int row, int col) {
-		if(a[row][col] == 0 && p[row][col].size() == 1 ) {
-			setSolvedValue(row, col, p[row][col].first().intValue());
-		}		
+	private void solveUniqProbableInCol(int col) {
+		for(int i=0; i<9; i++) {
+			solveUniqProbable(i, col);
+		}
 	}
 
-	private void solveUniqProbableInCol(int col) {
+	private void solveUniqProbableInColReverse(int col) {
 		for (int n=1; n<=9; n++) {
 			int counter = 0;
 			int foundRow = 10;
@@ -247,6 +323,16 @@ public class SudokuSolver {
 	}
 
 	private void solveUniqProbableInBox(int row, int col) {
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+		for(int i=boxI; i<(boxI+3); i++) {
+			for(int j=boxJ; j<(boxJ+3); j++) {
+				solveUniqProbable(i, j);
+			}
+		}
+	}
+
+	private void solveUniqProbableInBoxReverse(int row, int col) {
 		for (int n=1; n<=9; n++) {
 			int counter = 0;
 			int foundRow = 10;
@@ -273,7 +359,53 @@ public class SudokuSolver {
 		a[row][col] = val;
 		resetProbables(row, col);
 		print();
-		isValid();
+	}
+
+	private void resetProbables() {
+		for(int i=0; i<9; i++) {
+			for(int j=0; j<9; j++) {
+				resetProbables(i, j);
+			}
+		}
+		printProbables();
+	}
+
+	private void resetProbables(int row, int col) {
+		if(a[row][col] == 0) {
+			if (p[row][col] == null || p[row][col].size() == 0) {
+				initProbables(row, col);
+			}
+		} else {
+			p[row][col].clear();
+
+			eliminateRowUnProbables(row, col);
+			eliminateColUnProbables(row, col);
+			eliminateBoxUnProbables(row, col);
+
+			//printProbables();
+		}
+	}
+
+	private void eliminateRowUnProbables(int row, int col) {
+		for(int j=0; j<9; j++) {
+			p[row][j].remove(a[row][col]);
+		}
+	}
+	
+	private void eliminateColUnProbables(int row, int col) {
+		for(int i=0;i<9; i++) {
+			p[i][col].remove(a[row][col]);
+		}
+	}
+
+	private void eliminateBoxUnProbables(int row, int col) {
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+		for(int i=boxI; i<(boxI+3); i++) {
+			for(int j=boxJ; j<(boxJ+3); j++) {
+				p[i][j].remove(a[row][col]);
+			}
+		}
 	}
 
 	private void solveDoubleProbableInRow(int row) {
@@ -324,7 +456,7 @@ public class SudokuSolver {
 							p[k][col].removeAll(p[i][col]);
 						}
 					}
-					printProbables();
+					//printProbables();
 				}
 			}
 		}
@@ -361,77 +493,160 @@ public class SudokuSolver {
 								}
 							}
 						}
-						printProbables();
+						//printProbables();
 					}
 				}
 			}
 		}
 	}
 
-	private void resetProbables() {
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
-				resetProbables(i, j);
-			}
-		}
-		printProbables();
-	}
-
-	private void resetProbables(int row, int col) {
-		if(a[row][col] == 0) {
-			if (p[row][col] == null || p[row][col].size() == 0) {
-				initProbables(row, col);
-			}
-		} else {
-			p[row][col].clear();
-		}
-
-		eliminateRowUnProbables(row, col);
-		eliminateColUnProbables(row, col);
-		eliminateBoxUnProbables(row, col);
-
-		//printProbables();
-	}
-
-	private void eliminateRowUnProbables(int row, int col) {
+	private void solveDoubleProbableInRowReverse(int row) {
 		for(int j=0; j<9; j++) {
-			p[row][j].remove(a[row][col]);
-		}
-	}
-	
-	private void eliminateColUnProbables(int row, int col) {
-		for(int i=0;i<9; i++) {
-			p[i][col].remove(a[row][col]);
+			solveDoubleProbableInRowReverse(row, j);
 		}
 	}
 
-	private void eliminateBoxUnProbables(int row, int col) {
+	private void solveDoubleProbableInRowReverse(int row, int col) {
+		if (p[row][col].size() > 2) {
+			// double probable candidate
+			Integer[] arr = new Integer[0];
+			arr = p[row][col].toArray(arr);
+			for (int x=0; x<arr.length; x++) {
+				int first = arr[x];
+				for (int y=x+1; y<arr.length; y++) {
+					int second = arr[y];
+					int foundCol = 10;
+					int counter = 1;
+					for(int k=0; k<9; k++) {
+						if (k != col && p[row][k].size() >= 2
+								&& (p[row][k].contains(first) || p[row][k].contains(second))) {
+							counter ++;
+							foundCol = k;
+						}
+					}
+					if (counter == 2) {
+						// double found, keep this double and remove others from probables of those boxes
+						/*
+						if (foundCol == 10) {
+							System.out.println("foundCol="+foundCol);
+						}
+						*/
+						if (p[row][col].size() > 2) { 
+							p[row][col].clear();
+							p[row][col].add(first);
+							p[row][col].add(second);
+						}
+
+						if (p[row][foundCol].size() > 2) { 
+							p[row][foundCol].clear();
+							p[row][foundCol].add(first);
+							p[row][foundCol].add(second);
+						}
+
+						//printProbables();
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	private void solveDoubleProbableInColReverse(int col) {
+		for(int i=0; i<9; i++) {
+			solveDoubleProbableInColReverse(i, col);
+		}
+	}
+
+	private void solveDoubleProbableInColReverse(int row, int col) {
+		if (p[row][col].size() > 2) {
+			// double probable candidate
+			Integer[] arr = new Integer[0];
+			arr = p[row][col].toArray(arr);
+			for (int x=0; x<arr.length; x++) {
+				int first = arr[x];
+				for (int y=x+1; y<arr.length; y++) {
+					int second = arr[y];
+					int foundRow = 10;
+					int counter = 1;
+					for(int k=0; k<9; k++) {
+						if (k != row && p[k][col].size() >= 2
+								&& (p[k][col].contains(first) || p[k][col].contains(second))) {
+							counter ++;
+							foundRow = k;
+						}
+					}
+					if (counter == 2) {
+						// double found, keep this double and remove others from probables of those boxes
+						if (p[row][col].size() > 2) {
+							p[row][col].clear();
+							p[row][col].add(first);
+							p[row][col].add(second);
+						}
+
+						if (p[foundRow][col].size() > 2) { 
+							p[foundRow][col].clear();
+							p[foundRow][col].add(first);
+							p[foundRow][col].add(second);
+						}
+
+						//printProbables();
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	private void solveDoubleProbableInBoxReverse(int row, int col) {
 		int boxI = (row / 3) * 3;
 		int boxJ = (col / 3) * 3;
-		for(int i=boxI; i<(boxI+3); i++) {
-			for(int j=boxJ; j<(boxJ+3); j++) {
-				p[i][j].remove(a[row][col]);
+
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
+				if (p[i][j].size() > 2) {
+					// double probable candidate
+					Integer[] arr = new Integer[0];
+					arr = p[i][j].toArray(arr);
+					for (int x=0; x<arr.length; x++) {
+						int first = arr[x];
+						for (int y=x+1; y<arr.length; y++) {
+							int second = arr[y];
+							int foundRow = 10;
+							int foundCol = 10;
+							int counter = 1;
+							for (int k=boxI; k<(boxI+3); k++) {
+								for (int l=boxJ; l<(boxJ+3); l++) {
+									if (!(k == i && l == j) && p[k][l].size() >= 2
+											&& (p[k][l].contains(first) || p[k][l].contains(second))) {
+										counter ++;
+										foundRow = k;
+										foundCol = l;
+									}
+								}
+							}
+							if (counter == 2) {
+								// double found, keep this double and remove others from probables of those boxes
+								if (p[i][j].size() > 2) {
+									p[i][j].clear();
+									p[i][j].add(first);
+									p[i][j].add(second);
+								}
+		
+								if (p[foundRow][foundCol].size() > 2) { 
+									p[foundRow][foundCol].clear();
+									p[foundRow][foundCol].add(first);
+									p[foundRow][foundCol].add(second);
+								}
+		
+								//printProbables();
+								return;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
-/*
-	private char toChar(int digit) {
-		switch(digit) {
-			case 0: return '0';
-			case 1: return '1';
-			case 2: return '2';
-			case 3: return '3';
-			case 4: return '4';
-			case 5: return '5';
-			case 6: return '6';
-			case 7: return '7';
-			case 8: return '8';
-			case 9: return '9';
-		}
-
-		return '0';
-	}
-*/
 
 	private void print() {
 		printPuzzle();
@@ -481,98 +696,98 @@ public class SudokuSolver {
 	public void setKnownValues() {
 		//	a[0][0] = 0;
 		//	a[0][1] = 0;
-		//	a[0][2] = 0;
-		//	a[0][3] = 0;
+			a[0][2] = 3;
+			a[0][3] = 7;
 		//	a[0][4] = 0;
-		//	a[0][5] = 0;
-		//	a[0][6] = 0;
+			a[0][5] = 4;
+			a[0][6] = 2;
 		//	a[0][7] = 0;
 		//	a[0][8] = 0;
 
 		//	a[1][0] = 0;
-			a[1][1] = 5;
+		//	a[1][1] = 0;
 		//	a[1][2] = 0;
 		//	a[1][3] = 0;
-			a[1][4] = 2;
+		//	a[1][4] = 0;
 		//	a[1][5] = 0;
 		//	a[1][6] = 0;
-			a[1][7] = 6;
+		//	a[1][7] = 0;
 		//	a[1][8] = 0;
 
-		//	a[2][0] = 0;
+			a[2][0] = 5;
 		//	a[2][1] = 0;
-			a[2][2] = 1;
-			a[2][3] = 4;
+			a[2][2] = 8;
+		//	a[2][3] = 0;
 		//	a[2][4] = 0;
-			a[2][5] = 6;
-			a[2][6] = 5;
+		//	a[2][5] = 0;
+			a[2][6] = 6;
 		//	a[2][7] = 0;
-		//	a[2][8] = 0;
+			a[2][8] = 1;
 
-		//	a[3][0] = 0;
+			a[3][0] = 2;
 		//	a[3][1] = 0;
-			a[3][2] = 6;
+		//	a[3][2] = 0;
 		//	a[3][3] = 0;
-		//	a[3][4] = 0;
+			a[3][4] = 9;
 		//	a[3][5] = 0;
-			a[3][6] = 1;
+		//	a[3][6] = 0;
 		//	a[3][7] = 0;
-		//	a[3][8] = 0;
+			a[3][8] = 3;
 
 		//	a[4][0] = 0;
-			a[4][1] = 3;
+		//	a[4][1] = 0;
 		//	a[4][2] = 0;
-		//	a[4][3] = 0;
-			a[4][4] = 8;
-		//	a[4][5] = 0;
+			a[4][3] = 8;
+		//	a[4][4] = 0;
+			a[4][5] = 6;
 		//	a[4][6] = 0;
-			a[4][7] = 2;
+		//	a[4][7] = 0;
 		//	a[4][8] = 0;
 
-			a[5][0] = 0;
+			a[5][0] = 1;
 		//	a[5][1] = 0;
-			a[5][2] = 9;
+		//	a[5][2] = 0;
 		//	a[5][3] = 0;
-			a[5][4] = 0;
+			a[5][4] = 7;
 		//	a[5][5] = 0;
-			a[5][6] = 6;
+		//	a[5][6] = 0;
 		//	a[5][7] = 0;
-		//	a[5][8] = 0;
+			a[5][8] = 6;
 
-		//	a[6][0] = 0;
+			a[6][0] = 3;
 		//	a[6][1] = 0;
-			a[6][2] = 5;
-			a[6][3] = 7;
+			a[6][2] = 1;
+		//	a[6][3] = 0;
 		//	a[6][4] = 0;
-			a[6][5] = 1;
-			a[6][6] = 9;
+		//	a[6][5] = 0;
+			a[6][6] = 5;
 		//	a[6][7] = 0;
-		//	a[6][8] = 0;
+			a[6][8] = 8;
 
 		//	a[7][0] = 0;
-			a[7][1] = 7;
+		//	a[7][1] = 0;
 		//	a[7][2] = 0;
 		//	a[7][3] = 0;
-			a[7][4] = 3;
+		//	a[7][4] = 0;
 		//	a[7][5] = 0;
 		//	a[7][6] = 0;
-			a[7][7] = 4;
-			a[7][8] = 0;
+		//	a[7][7] = 0;
+		//	a[7][8] = 0;
 
 		//	a[8][0] = 0;
 		//	a[8][1] = 0;
-		//	a[8][2] = 0;
-		//	a[8][3] = 0;
+			a[8][2] = 9;
+			a[8][3] = 4;
 		//	a[8][4] = 0;
-		//	a[8][5] = 0;
-		//	a[8][6] = 0;
+			a[8][5] = 5;
+			a[8][6] = 7;
 		//	a[8][7] = 0;
 		//	a[8][8] = 0;
 
 		printPuzzle();
 
 		if (! isValid()) {
-			System.exit(1);
+			exitAsInvalid();
 		}
 	}
 }
