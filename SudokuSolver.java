@@ -1,16 +1,32 @@
 package com.muneer.sudoku;
 
+import java.util.TreeSet;
+
 /**
  * @author Muneer Ahmed Syed
- * @version 0.1
- * This class is to solve sodoku puzzle
+ * @version 0.2
+ * This class solves Sodoku puzzle
+ * TODO: to process two probable in reverse
+ * TODO: to process three probable
+ * TODO: to try randomization if puzzle is not getting solved after too many iterations
+ * TODO: optimize performance
  */
 public class SudokuSolver {
 
 	private int a[][];
-	private String p[][];
+	private TreeSet<Integer> p[][];
 	//private int counter = 0;
 	private int tryc = 0;
+
+	private static final Integer N1 = 1;
+	private static final Integer N2 = 2;
+	private static final Integer N3 = 3;
+	private static final Integer N4 = 4;
+	private static final Integer N5 = 5;
+	private static final Integer N6 = 6;
+	private static final Integer N7 = 7;
+	private static final Integer N8 = 8;
+	private static final Integer N9 = 9;
 
 	public SudokuSolver() {
 		init();
@@ -19,375 +35,373 @@ public class SudokuSolver {
 
 	public static void main(String[] args) {
 		SudokuSolver sudokuSolver = new SudokuSolver();
-		
+
 		sudokuSolver.solve();
-		//sudokuSolver.printProbables();
-		
-		sudokuSolver.print();
+
 	}
 
+	@SuppressWarnings("unchecked")
 	private void init() {
 		a = new int[9][9];
-		p = new String[9][9];
+		p = new TreeSet[9][9];
 		for(int i=0; i<9; i++) {
 			for(int j=0; j<9; j++) {
 				a[i][j] = 0;
-				p[i][j] = "123456789";
+				initProbables(i, j);
 			}
 		}
+	}
+
+	private void initProbables(int i, int j) {
+		p[i][j] = new TreeSet<Integer>();
+		p[i][j].add(N1);
+		p[i][j].add(N2);
+		p[i][j].add(N3);
+		p[i][j].add(N4);
+		p[i][j].add(N5);
+		p[i][j].add(N6);
+		p[i][j].add(N7);
+		p[i][j].add(N8);
+		p[i][j].add(N9);
 	}
 
 	public void solve() {
 		resetProbables();
-		//findProbables();
-		printProbables();
+
 		do {
 			for(int i=0; i<9; i++) {
-				solveOneMissingInRow(i);
+				solveUniqProbableInRow(i);
 				for(int j=0; j<9; j++) {
 					System.out.println("****************** i=" + i + " j=" + j);
-					solveOneMissingInCol(j);
-					solveOneMissingInBox(i, j);
-					solveUniqueProbable();
-					if(a[i][j] == 0) {
-						solveByElimination(i, j);
-						solveByProbability(i, j);
-						//resetProbables(i, j);
-						//print();
-					}
-					resetProbables(i, j);
-				}
-			}
 
-			solveByRow();
-			//solveByCol();
-			//solveByBox();
-			print();
-		} while(!checkIfAllResolved());
-	}
+					solveUniqProbable(i, j);
 
-	private boolean checkIfAllResolved() {
-		tryc ++;
-		resetProbables();
-		if (tryc % 1000 == 0 ) {
-			System.out.println("Tried and failed after " + tryc + " attempts");
-			printProbables();
-			//solveByRow();
-			//solveByCol();
-			//solveByBox();
-			System.exit(1);
-		}
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
-				if(a[i][j] == 0) {
-					return false;
-				}
-			}
-		}
+					solveUniqProbableInCol(j);
+					solveUniqProbableInBox(i, j);
 
-		return true;
-	}
+					solveDoubleProbableInCol(j);
+					solveDoubleProbableInBox(i, j);
 
-	private void solveByProbability() {
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
-				if(a[i][j] == 0) {
-					//System.out.println("counter=" + ++ counter);
-					findProbables(i, j);
-					if((p[i][j]).length() == 1) {
-						a[i][j] = Integer.parseInt(p[i][j]);
+					solveUniqProbable(i, j);
+
+					if(a[i][j] != 0) {
 						resetProbables(i, j);
 					}
+
+					isResolved();
 				}
+
+				solveDoubleProbableInRow(i);
+
 			}
+
+			exitAfterMaxTry();
+
+		} while(! isResolved());
+	}
+
+	private void exitSuccess() {
+		System.out.println("Successful in " + tryc + " iterations");
+		printPuzzle();
+		System.exit(0);
+	}
+
+	private void exitAfterMaxTry() {
+		tryc ++;
+		int maxTry = 1000;
+		//resetProbables();
+		if (tryc % maxTry == 0 ) {
+			System.out.println("Tried and failed after " + tryc + " iterations");
+			printProbables();
+			System.exit(3);
 		}
 	}
 
-	private void solveByProbability(int row, int col) {
-		if(a[row][col] == 0) {
-			//System.out.println("counter=" + ++ counter);
-			findProbables(row, col);
-			if((p[row][col]).length() == 1) {
-				a[row][col] = Integer.parseInt(p[row][col]);
-				resetProbables(row, col);
-			}
-		}
-	}
-
-	private void solveByRow() {
-		for(int i=0; i<9; i++) {
-			solveByRow(i);
-		}
-		resetProbables();
-	}
-
-	private void solveByRow(int row) {
-		String rowProbables = "123456789";
-		int blanks;
-		int cans;
-		int lastCanCol = 0;
-		int num;
-
-		for(int j=0; j<9; j++) {
-			rowProbables = rowProbables.replaceAll(String.valueOf(a[row][j]), "");
-		}
-
-		blanks = rowProbables.length();
-
-		for(int k=0; k<blanks; k++) {
-			cans = 0;
-			num = Integer.parseInt(String.valueOf(rowProbables.charAt(k)));
-			for(int j=0; j<9; j++) {
-				if(a[row][j] == 0) {
-					cans = 0;
-					if(canBeInCol(j, num) && canBeInBox(row, j, num)) {
-						++cans;
-						lastCanCol = j;
-					}
-				}
-			}
-			if(cans == 1) {
-				a[row][lastCanCol] = num;
-				resetProbables(row, lastCanCol);
-				print();
-			}
-		}
-	}
-	
-	private void solveByCol() {
-		for(int j=0; j<9; j++) {
-			solveByCol(j);
-		}
-		resetProbables();
-	}
-
-	private void solveByCol(int col) {
-		String colProbables = "123456789";
-		int blanks;
-		int cans;
-		int lastCanRow = 0;
-		int num;
-		for(int i=0; i<9; i++) {
-			colProbables = colProbables.replaceAll(String.valueOf(a[i][col]), "");
-		}
-		blanks = colProbables.length();
-		for(int k=0; k<blanks; k++) {
-			cans = 0;
-			num = Integer.parseInt(String.valueOf(colProbables.charAt(k)));
-			for(int i=0; i<9; i++) {
-				if(a[i][col] == 0) {
-					cans = 0;
-					if(canBeInRow(i, num) && canBeInBox(i, col, num)) {
-						cans++;
-						lastCanRow = i;
-					}
-				}
-			}
-			if(cans == 1) {
-				a[lastCanRow][col] = num;
-				resetProbables(lastCanRow, col);
-				print();
-			}
-		}
-	}
-
-	private void solveByElimination(int row, int col) {
-		//System.out.println("counter=" + ++ counter);
-		int num;
-		for(int k=0; k<p[row][col].length(); k++) {
-			num = Integer.parseInt(String.valueOf(p[row][col].charAt(k)));
-			if((! canBeInRow(row, num)) || (! canBeInCol(col, num)) || (! canBeInBox(row, col, num))) {
-				p[row][col] = (p[row][col]).replaceAll(String.valueOf(num), "");
-			}
-		}
-		solveUniqueProbable(row, col);
-	}
-
-	private void solveUniqueProbable(int row, int col) {
-		if(a[row][col] == 0) {
-			if(p[row][col].length() == 1) {
-				a[row][col] = Integer.parseInt(p[row][col]);
-				resetProbables(row, col);
-				print();
-			}
-		}
-	}
-
-	private void solveUniqueProbable() {
-		//System.out.println("counter=" + ++ counter);
+	private boolean isResolved() {
 		for(int i=0; i<9; i++) {
 			for(int j=0; j<9; j++) {
-				solveUniqueProbable(i, j);
-			}
-		}
-	}
-
-	private void solveOneMissingInRow(int row) {
-		int count = 0;
-		int missingCol = 0;
-		String probables = "123456789";
-		for(int j=0; j<9; j++) {
-			missingCol = j;
-			if(a[row][j] == 0) {
-				if(++count > 1) {
-					break;
-				}
-			} else {
-				probables = probables.replaceAll(String.valueOf(a[row][j]), "");
-			}
-		}
-
-		if(count==1 && probables.length()==1) {
-			// only one is missing in the row
-			a[row][missingCol] = Integer.parseInt(probables);
-			print();
-		}
-	}
-
-	private void solveOneMissingInCol(int col) {
-		int count = 0;
-		int missingRow = 0;
-		String probables = "123456789";
-		for(int i=0; i<9; i++) {
-			missingRow = i;
-			if(a[i][col] == 0) {
-				if(++count > 1) {
-					break;
-				}
-			} else {
-				probables = probables.replaceAll(String.valueOf(a[i][col]), "");
-			}
-		}
-
-		if(count==1 && probables.length()==1) {
-			// only one is missing in the row
-			a[missingRow][col] = Integer.parseInt(probables);
-			print();
-		}
-	}
-
-	private void solveOneMissingInBox(int row, int col) {
-		int count = 0;
-		int missingRow = 0;
-		int missingCol = 0;
-		String probables = "123456789";
-		int boxI = (row / 3) * 3;
-		int boxJ = (col / 3) * 3;
-		for(int i=boxI; i<(boxI+3); i++) {
-			for(int j=boxJ; j<(boxJ+3); j++) {
-				missingRow = i;
-				missingCol = j;
 				if(a[i][j] == 0) {
-					if(++count > 1) {
-						break;
-					}
-				} else {
-					probables = probables.replaceAll(String.valueOf(a[i][j]), "");
-				}
-			}
-		}
-
-		if(count==1 && probables.length()==1) {
-			// only one is missing in the box
-			a[missingRow][missingCol] = Integer.parseInt(probables);
-			print();
-		}
-	}
-
-	private boolean canBeInRow(int row, int num) {
-		for(int j=0; j<9; j++) {
-			if(num == a[row][j]) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean canBeInCol(int col, int num) {
-		for(int i=0; i<9; i++) {
-			if(num == a[i][col]) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private boolean canBeInBox(int row, int col, int num) {
-		int boxI = (row / 3) * 3;
-		int boxJ = (col / 3) * 3;
-		for(int i=boxI; i<(boxI+3); i++) {
-			for(int j=boxJ; j<(boxJ+3); j++) {
-				if(num == a[i][j]) {
 					return false;
 				}
 			}
 		}
+
+		if (! isValid()) {
+			System.exit(2);
+		}
+
+		exitSuccess();
+		
 		return true;
 	}
-	
-	private void findProbables() {
-		//resetProbables();
-		for(int i=0; i<9; i++) {
+
+	private boolean isValid() {
+		if (isRowInvalid()) {
+			return false; 
+		}
+		if (isColInvalid()) {
+			return false; 
+		}
+		if (isBoxInvalid()) {
+			return false; 
+		}
+
+		return true;
+	}
+
+	private boolean isRowInvalid() {
+		// validate row
+		for (int i=0; i<9; i++) {
+			for (int j=0; j<9; j++) {
+				for (int k=0; k<9; k++) {
+					if (j != k && a[i][j] != 0 && a[i][j] == a[i][k]) {
+						// duplicate found
+						System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + i + "][" + k + "]");
+						return true;
+					}
+				}
+				
+			}
+		}
+		return false;
+	}
+
+	private boolean isColInvalid() {
+		// validate row
+		for (int j=0; j<9; j++) {
+			for (int i=0; i<9; i++) {
+				for (int k=0; k<9; k++) {
+					if (i != k &&  a[i][j] != 0 && a[i][j] == a[k][j]) {
+						// duplicate found
+						System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + j + "]");
+						return true;
+					}
+				}
+				
+			}
+		}
+		return false;
+	}
+
+	private boolean isBoxInvalid() {
+		// validate row
+		for (int boxI=0; boxI<9; boxI+=3) {
+			for (int boxJ=0; boxJ<9; boxJ+=3) {
+				for (int i=boxI; i<boxI+3; i++) {
+					for (int j=boxJ; j<boxJ+3; j++) {
+						for (int k=boxI; k<boxI+3; k++) {
+							for (int l=boxJ; l<boxJ+3; l++) {
+								if (i != k && j != l  && a[i][j] != 0 && a[i][j] == a[k][l]) {
+									// duplicate found
+									System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + l + "]");
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private void solveUniqProbableInRow(int row) {
+		for (int n=1; n<=9; n++) {
+			int counter = 0;
+			int foundCol = 10;
 			for(int j=0; j<9; j++) {
-				findProbables(i, j);
+				if (p[row][j].contains(n)) {
+					foundCol = j;
+					counter ++;
+				}
+			}
+			if (counter == 1) {
+				// n is present only once
+				setSolvedValue(row, foundCol, n);
 			}
 		}
 	}
 
-	private void findProbables(int row, int col) {
-		//resetProbables(row, col);
-		if(a[row][col] == 0) {
-			eliminateRowUnProbables(row, col);
-			eliminateColUnProbables(row, col);
-			eliminateBoxUnProbables(row, col);
-			//printProbables();
+	private void solveUniqProbable(int row, int col) {
+		if(a[row][col] == 0 && p[row][col].size() == 1 ) {
+			setSolvedValue(row, col, p[row][col].first().intValue());
+		}		
+	}
+
+	private void solveUniqProbableInCol(int col) {
+		for (int n=1; n<=9; n++) {
+			int counter = 0;
+			int foundRow = 10;
+			for(int i=0; i<9; i++) {
+				if (p[i][col].contains(n)) {
+					foundRow = i;
+					counter ++;
+				}
+			}
+			if (counter == 1) {
+				// n is present only once
+				setSolvedValue(foundRow, col, n);
+			}
 		}
 	}
-	
+
+	private void solveUniqProbableInBox(int row, int col) {
+		for (int n=1; n<=9; n++) {
+			int counter = 0;
+			int foundRow = 10;
+			int foundCol = 10;
+			int boxI = (row / 3) * 3;
+			int boxJ = (col / 3) * 3;
+			for(int i=boxI; i<(boxI+3); i++) {
+				for(int j=boxJ; j<(boxJ+3); j++) {
+					if (p[i][j].contains(n)) {
+						foundRow = i;
+						foundCol = j;
+						counter ++;
+					}
+				}
+			}
+			if (counter == 1) {
+				// n is present only once
+				setSolvedValue(foundRow, foundCol, n);
+			}
+		}
+	}
+
+	private void setSolvedValue(int row, int col, int val) {
+		a[row][col] = val;
+		resetProbables(row, col);
+		print();
+		isValid();
+	}
+
+	private void solveDoubleProbableInRow(int row) {
+		for(int j=0; j<9; j++) {
+			if (p[row][j].size() == 2) {
+				// double probable candidate
+				boolean doubleFound = false;
+				int foundCol = 10;
+
+				for(int k=0; k<9; k++) {
+					if (k != j && p[row][k].size() == 2 && p[row][k].containsAll(p[row][j])) {
+						// double found
+						foundCol = k;
+						doubleFound = true;
+					}
+				}
+				if (doubleFound) {
+					// remove these probable from other elements of row
+					for(int k=0; k<9; k++) {
+						if (k != j && k != foundCol) {
+							p[row][k].removeAll(p[row][j]);
+						}
+					}
+					printProbables();
+				}
+			}
+		}
+	}
+
+	private void solveDoubleProbableInCol(int col) {
+		for(int i=0; i<9; i++) {
+			if (p[i][col].size() == 2) {
+				// double probable candidate
+				boolean doubleFound = false;
+				int foundRow = 10;
+
+				for(int k=0; k<9; k++) {
+					if (k != i && p[k][col].size() == 2 && p[k][col].containsAll(p[i][col])) {
+						// double found
+						foundRow = k;
+						doubleFound = true;
+					}
+				}
+				if (doubleFound) {
+					// remove these probable from other elements of col
+					for(int k=0; k<9; k++) {
+						if (k != i && k != foundRow) {
+							p[k][col].removeAll(p[i][col]);
+						}
+					}
+					printProbables();
+				}
+			}
+		}
+	}
+
+	private void solveDoubleProbableInBox(int row, int col) {
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+
+		for(int i=boxI; i<(boxI+3); i++) {
+			for(int j=boxJ; j<(boxJ+3); j++) {
+				if (p[i][j].size() == 2) {
+					// double probable candidate
+					boolean doubleFound = false;
+					int foundRow = 10;
+					int foundCol = 10;
+
+					for(int k=boxI; k<(boxI+3); k++) {
+						for(int l=boxJ; l<(boxJ+3); l++) {
+							if (!(k == i && l == j) && p[k][l].size() == 2 && p[k][l].containsAll(p[i][j])) {
+								// double found
+								foundRow = k;
+								foundCol = l;
+								doubleFound = true;
+							}
+						}
+					}
+					if (doubleFound) {
+						// remove these probable from other elements of col
+						for(int k=boxI; k<(boxI+3); k++) {
+							for(int l=boxJ; l<(boxJ+3); l++) {
+								if (!(k == i && l == j) && !(k == foundRow && l == foundCol)) {
+									p[k][l].removeAll(p[i][j]);
+								}
+							}
+						}
+						printProbables();
+					}
+				}
+			}
+		}
+	}
+
 	private void resetProbables() {
 		for(int i=0; i<9; i++) {
 			for(int j=0; j<9; j++) {
 				resetProbables(i, j);
 			}
 		}
-		//printProbables();
+		printProbables();
 	}
 
 	private void resetProbables(int row, int col) {
 		if(a[row][col] == 0) {
-			if (p[row][col].equals("")) {
-				p[row][col] = "123456789";
+			if (p[row][col] == null || p[row][col].size() == 0) {
+				initProbables(row, col);
 			}
-			findProbables(row, col);
+		} else {
+			p[row][col].clear();
 		}
-		if(a[row][col] != 0) {
-			p[row][col] = "";
-		}
+
+		eliminateRowUnProbables(row, col);
+		eliminateColUnProbables(row, col);
+		eliminateBoxUnProbables(row, col);
+
 		//printProbables();
 	}
 
 	private void eliminateRowUnProbables(int row, int col) {
 		for(int j=0; j<9; j++) {
-			if((p[row][col]).indexOf(String.valueOf(a[row][j])) == -1) {
-				// means a[row][j]=0 or a[row][j] is already eliminated from probables 
-				continue;
-			} else {
-				// a[row][j] cannot come in a[row][col]
-				p[row][col] = (p[row][col]).replaceAll(String.valueOf(a[row][j]), "");
-			}
+			p[row][j].remove(a[row][col]);
 		}
 	}
 	
 	private void eliminateColUnProbables(int row, int col) {
 		for(int i=0;i<9; i++) {
-			if((p[row][col]).indexOf(String.valueOf(a[i][col])) == -1) {
-				// means a[i][col]=0 or a[i][col] is already eliminated from probables 
-				continue;
-			} else {
-				// a[i][col] cannot come in a[row][col]
-				p[row][col] = (p[row][col]).replaceAll(String.valueOf(a[i][col]), "");
-			}
+			p[i][col].remove(a[row][col]);
 		}
 	}
 
@@ -396,17 +410,11 @@ public class SudokuSolver {
 		int boxJ = (col / 3) * 3;
 		for(int i=boxI; i<(boxI+3); i++) {
 			for(int j=boxJ; j<(boxJ+3); j++) {
-				if((p[row][col]).indexOf(String.valueOf(a[i][j])) == -1) {
-					// means a[i][j]=0 or a[i][j] is already eliminated from probables 
-					continue;
-				} else {
-					// a[i][j] cannot come in a[row][col]
-					p[row][col] = (p[row][col]).replaceAll(String.valueOf(a[i][j]), "");
-				}
+				p[i][j].remove(a[row][col]);
 			}
 		}
 	}
-
+/*
 	private char toChar(int digit) {
 		switch(digit) {
 			case 0: return '0';
@@ -423,101 +431,14 @@ public class SudokuSolver {
 
 		return '0';
 	}
+*/
 
-	public void setKnownValues() {
-	//	a[0][0] = 3;
-	//	a[0][1] = 3;
-	//	a[0][2] = 3;
-		a[0][3] = 3;
-	//	a[0][4] = 3;
-	//	a[0][5] = 3;
-	//	a[0][6] = 3;
-	//	a[0][7] = 3;
-		a[0][8] = 1;
-
-		a[1][0] = 5;
-	//	a[1][1] = 8;
-		a[1][2] = 6;
-	//	a[1][3] = 8;
-		a[1][4] = 8;
-		a[1][5] = 4;
-	//	a[1][6] = 8;
-	//	a[1][7] = 8;
-	//	a[1][8] = 8;
-
-		a[2][0] = 9;
-	//	a[2][1] = 8;
-	//	a[2][2] = 8;
-	//	a[2][3] = 8;
-		a[2][4] = 6;
-	//	a[2][5] = 6;
-	//	a[2][6] = 8;
-	//	a[2][7] = 8;
-	//	a[2][8] = 8;
-
-	//	a[3][0] = 8;
-		a[3][1] = 4;
-	//	a[3][2] = 8;
-		a[3][3] = 6;
-	//	a[3][4] = 2;
-	//	a[3][5] = 6;
-	//	a[3][6] = 8;
-		a[3][7] = 2;
-		a[3][8] = 7;
-
-	//	a[4][0] = 8;
-	//	a[4][1] = 8;
-		a[4][2] = 5;
-	//	a[4][3] = 8;
-	//	a[4][4] = 2;
-	//	a[4][5] = 6;
-		a[4][6] = 8;
-	//	a[4][7] = 8;
-	//	a[4][8] = 8;
-
-		a[5][0] = 2;
-		a[5][1] = 6;
-	//	a[5][2] = 8;
-	//	a[5][3] = 8;
-	//	a[5][4] = 2;
-		a[5][5] = 8;
-	//	a[5][6] = 8;
-		a[5][7] = 5;
-	//	a[5][8] = 8;
-
-	//	a[6][0] = 8;
-	//	a[6][1] = 8;
-	//	a[6][2] = 8;
-	//	a[6][3] = 8;
-		a[6][4] = 7;
-	//	a[6][5] = 6;
-	//	a[6][6] = 8;
-	//	a[6][7] = 8;
-		a[6][8] = 6;
-
-	//	a[7][0] = 8;
-	//	a[7][1] = 8;
-	//	a[7][2] = 8;
-		a[7][3] = 1;
-		a[7][4] = 3;
-	//	a[7][5] = 6;
-		a[7][6] = 7;
-	//	a[7][7] = 8;
-		a[7][8] = 2;
-
-		a[8][0] = 6;
-	//	a[8][1] = 8;
-	//	a[8][2] = 8;
-	//	a[8][3] = 8;
-	//	a[8][4] = 2;
-		a[8][5] = 9;
-	//	a[8][6] = 8;
-	//	a[8][7] = 8;
-	//	a[8][8] = 8;
-
-	}
-	
 	private void print() {
+		printPuzzle();
+		printProbables();
+	}
+
+	private void printPuzzle() {
 		System.out.println("------------------");
 		for(int i=0; i<9; i++) {
 			//System.out.print("|");
@@ -533,29 +454,125 @@ public class SudokuSolver {
 			System.out.println();
 			//System.out.println("\n------------------");	
 		}
-		printProbables();
 	}
 	
 	private void printProbables() {
 		System.out.println("==================");
 		for(int i=0; i<9; i++) {
 			for(int j=0; j<9; j++) {
-				System.out.print("p" + i + j + "=" + p[i][j]);
-				for(int k=9; k>p[i][j].length(); k--) {
-					System.out.print(" ");
-				}
+				System.out.print("p" + i + j + "=");
+				printProbables(i, j);
 			}
 			System.out.println();
 		}
 	}
-	
-	private void printNonBalnkProbables() {
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
-				if(! p[i][j].equals("")) {
-					System.out.print("p" + i + j + "=" + p[i][j]);
-				}
+
+	private void printProbables(int row, int col) {
+		for(int k=1; k<=9; k++) {
+			if(p[row][col].contains(k)) {
+				System.out.print(k);
+			} else {
+				System.out.print(" ");
 			}
+		}
+		System.out.print("\t");
+	}
+
+	public void setKnownValues() {
+		//	a[0][0] = 0;
+		//	a[0][1] = 0;
+		//	a[0][2] = 0;
+		//	a[0][3] = 0;
+		//	a[0][4] = 0;
+		//	a[0][5] = 0;
+		//	a[0][6] = 0;
+		//	a[0][7] = 0;
+		//	a[0][8] = 0;
+
+		//	a[1][0] = 0;
+			a[1][1] = 5;
+		//	a[1][2] = 0;
+		//	a[1][3] = 0;
+			a[1][4] = 2;
+		//	a[1][5] = 0;
+		//	a[1][6] = 0;
+			a[1][7] = 6;
+		//	a[1][8] = 0;
+
+		//	a[2][0] = 0;
+		//	a[2][1] = 0;
+			a[2][2] = 1;
+			a[2][3] = 4;
+		//	a[2][4] = 0;
+			a[2][5] = 6;
+			a[2][6] = 5;
+		//	a[2][7] = 0;
+		//	a[2][8] = 0;
+
+		//	a[3][0] = 0;
+		//	a[3][1] = 0;
+			a[3][2] = 6;
+		//	a[3][3] = 0;
+		//	a[3][4] = 0;
+		//	a[3][5] = 0;
+			a[3][6] = 1;
+		//	a[3][7] = 0;
+		//	a[3][8] = 0;
+
+		//	a[4][0] = 0;
+			a[4][1] = 3;
+		//	a[4][2] = 0;
+		//	a[4][3] = 0;
+			a[4][4] = 8;
+		//	a[4][5] = 0;
+		//	a[4][6] = 0;
+			a[4][7] = 2;
+		//	a[4][8] = 0;
+
+			a[5][0] = 0;
+		//	a[5][1] = 0;
+			a[5][2] = 9;
+		//	a[5][3] = 0;
+			a[5][4] = 0;
+		//	a[5][5] = 0;
+			a[5][6] = 6;
+		//	a[5][7] = 0;
+		//	a[5][8] = 0;
+
+		//	a[6][0] = 0;
+		//	a[6][1] = 0;
+			a[6][2] = 5;
+			a[6][3] = 7;
+		//	a[6][4] = 0;
+			a[6][5] = 1;
+			a[6][6] = 9;
+		//	a[6][7] = 0;
+		//	a[6][8] = 0;
+
+		//	a[7][0] = 0;
+			a[7][1] = 7;
+		//	a[7][2] = 0;
+		//	a[7][3] = 0;
+			a[7][4] = 3;
+		//	a[7][5] = 0;
+		//	a[7][6] = 0;
+			a[7][7] = 4;
+			a[7][8] = 0;
+
+		//	a[8][0] = 0;
+		//	a[8][1] = 0;
+		//	a[8][2] = 0;
+		//	a[8][3] = 0;
+		//	a[8][4] = 0;
+		//	a[8][5] = 0;
+		//	a[8][6] = 0;
+		//	a[8][7] = 0;
+		//	a[8][8] = 0;
+
+		printPuzzle();
+
+		if (! isValid()) {
+			System.exit(1);
 		}
 	}
 }
