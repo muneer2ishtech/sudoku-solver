@@ -1,11 +1,17 @@
 package com.muneer.sudoku;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.TreeSet;
 
 /**
  * @author Muneer Ahmed Syed
- * @version 0.3
+ * @version 0.4
  * This class solves Sodoku puzzle
+ * TODO: to process row & box and col & box combination
  * TODO: to process three probable
  * TODO: to try randomization if puzzle is not getting solved after too many iterations
  * TODO: optimize performance
@@ -29,12 +35,13 @@ public class SudokuSolver {
 
 	public SudokuSolver() {
 		init();
-		setKnownValues();
+		//setKnownValues();
 	}
 
 	public static void main(String[] args) {
 		SudokuSolver sudokuSolver = new SudokuSolver();
 
+		sudokuSolver.readInputFromFile("/home/ahmedsye/sample.txt");
 		sudokuSolver.solve();
 
 	}
@@ -64,6 +71,58 @@ public class SudokuSolver {
 		p[i][j].add(N9);
 	}
 
+	private void readInputFromFile(String absPath) {
+		try {
+			File file = new File(absPath);
+			if (! file.exists() ) {
+				System.err.println("File " + absPath + " not found");
+				System.exit(5);
+			}
+			if (! file.isFile()) {
+				System.err.println(absPath + " is not a proper file");
+				System.exit(5);	
+			}
+			if (! file.canRead()) {
+				System.err.println(absPath + " is not readable file");
+				System.exit(5);
+			}
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr); 
+			String s;
+			int i = 0;
+			while((s = br.readLine()) != null) {
+				if (s != null && s.length() != 0 && ! s.equals("\n")) {
+					for (int j=0; j<s.length() && j<9 && i<9; j++) {
+						char c = s.charAt(j);
+						if (c == ' ') {
+							c = '0';
+						}
+						a[i][j] = Integer.parseInt(String.valueOf(c));
+					}
+				}
+				i++;
+			}
+			fr.close();
+			printPuzzle();
+
+			if (! isValid()) {
+				exitAsInvalid();
+			}
+
+		} catch (NumberFormatException e) {
+			System.err.println("Input file " + absPath + " has non-numeric characters");
+			System.exit(5);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(5);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(5);
+		}
+	}
+
 	public void solve() {
 		resetProbables();
 
@@ -76,12 +135,12 @@ public class SudokuSolver {
 			}
 			for(int j=0; j<9; j++) {
 				solveDoubleProbableInCol(j);
-				//solveDoubleProbableInColReverse(j);
+				solveDoubleProbableInColReverse(j);
 			}
 			for(int i=0; i<9; i+=3) {
 				for(int j=0; j<9; j+=3) {
 					solveDoubleProbableInBox(i, j);
-					//solveDoubleProbableInBoxReverse(i, j);
+					solveDoubleProbableInBoxReverse(i, j);
 				}
 			}
 
@@ -103,14 +162,14 @@ public class SudokuSolver {
 
 	private void exitAfterMaxTry() {
 		tryc ++;
-		int maxTry = 1000;
+		int maxTry = 10000;
 		//resetProbables();
-		if (tryc % 100 == 0 ) {
+		if (tryc % 100000 == 0 ) {
 			System.out.println("Tried " + tryc + " iterations");
 			print();
 		}
 		if (tryc == maxTry) {
-			System.out.println("Tried and failed after " + tryc + " iterations");
+			System.err.println("Tried and failed after " + tryc + " iterations");
 			print();
 			System.exit(3);
 		}
@@ -166,7 +225,7 @@ public class SudokuSolver {
 			for (int k=0; k<9; k++) {
 				if (j != k && a[row][j] != 0 && a[row][j] == a[row][k]) {
 					// duplicate found
-					System.out.println("Duplicate value " + a[row][j] + " found for a[" + row + "][" + j + "] & a[" + row + "][" + k + "]");
+					printDups(row, j, row, k);
 					return true;
 				}
 			}
@@ -190,7 +249,7 @@ public class SudokuSolver {
 			for (int k=0; k<9; k++) {
 				if (i != k &&  a[i][col] != 0 && a[i][col] == a[k][col]) {
 					// duplicate found
-					System.out.println("Duplicate value " + a[i][col] + " found for a[" + i + "][" + col + "] & a[" + k + "][" + col + "]");
+					printDups(i, col, k, col);
 					return true;
 				}
 			}
@@ -222,7 +281,7 @@ public class SudokuSolver {
 					for (int l=boxJ; l<(boxJ+3); l++) {
 						if (i != k && j != l  && a[i][j] != 0 && a[i][j] == a[k][l]) {
 							// duplicate found
-							System.out.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + l + "]");
+							printDups(i, j, k, l);
 							return true;
 						}
 					}
@@ -429,7 +488,7 @@ public class SudokuSolver {
 							p[row][k].removeAll(p[row][j]);
 						}
 					}
-					printProbables();
+					//printProbables();
 				}
 			}
 		}
@@ -518,33 +577,35 @@ public class SudokuSolver {
 					int foundCol = 10;
 					int counter = 1;
 					for(int k=0; k<9; k++) {
-						if (k != col && p[row][k].size() >= 2
-								&& (p[row][k].contains(first) || p[row][k].contains(second))) {
+						if (k != col && (p[row][k].contains(first) || p[row][k].contains(second))) {
 							counter ++;
 							foundCol = k;
 						}
 					}
 					if (counter == 2) {
 						// double found, keep this double and remove others from probables of those boxes
-						/*
-						if (foundCol == 10) {
-							System.out.println("foundCol="+foundCol);
+						if (p[row][col].contains(first) && p[row][col].contains(second)
+								&& p[row][foundCol].contains(first) && p[row][foundCol].contains(second)) {
+							/*
+							if (foundCol == 10) {
+								System.out.println("foundCol="+foundCol);
+							}
+							*/
+							if (p[row][col].size() > 2) { 
+								p[row][col].clear();
+								p[row][col].add(first);
+								p[row][col].add(second);
+							}
+	
+							if (p[row][foundCol].size() > 2) { 
+								p[row][foundCol].clear();
+								p[row][foundCol].add(first);
+								p[row][foundCol].add(second);
+							}
+	
+							//printProbables();
+							return;
 						}
-						*/
-						if (p[row][col].size() > 2) { 
-							p[row][col].clear();
-							p[row][col].add(first);
-							p[row][col].add(second);
-						}
-
-						if (p[row][foundCol].size() > 2) { 
-							p[row][foundCol].clear();
-							p[row][foundCol].add(first);
-							p[row][foundCol].add(second);
-						}
-
-						//printProbables();
-						return;
 					}
 				}
 			}
@@ -569,28 +630,30 @@ public class SudokuSolver {
 					int foundRow = 10;
 					int counter = 1;
 					for(int k=0; k<9; k++) {
-						if (k != row && p[k][col].size() >= 2
-								&& (p[k][col].contains(first) || p[k][col].contains(second))) {
+						if (k != row && (p[k][col].contains(first) || p[k][col].contains(second))) {
 							counter ++;
 							foundRow = k;
 						}
 					}
 					if (counter == 2) {
-						// double found, keep this double and remove others from probables of those boxes
-						if (p[row][col].size() > 2) {
-							p[row][col].clear();
-							p[row][col].add(first);
-							p[row][col].add(second);
+						if (p[row][col].contains(first) && p[row][col].contains(second)
+								&& p[foundRow][col].contains(first) && p[foundRow][col].contains(second)) {
+							// double found, keep this double and remove others from probables of those boxes
+							if (p[row][col].size() > 2) {
+								p[row][col].clear();
+								p[row][col].add(first);
+								p[row][col].add(second);
+							}
+	
+							if (p[foundRow][col].size() > 2) { 
+								p[foundRow][col].clear();
+								p[foundRow][col].add(first);
+								p[foundRow][col].add(second);
+							}
+	
+							//printProbables();
+							return;
 						}
-
-						if (p[foundRow][col].size() > 2) { 
-							p[foundRow][col].clear();
-							p[foundRow][col].add(first);
-							p[foundRow][col].add(second);
-						}
-
-						//printProbables();
-						return;
 					}
 				}
 			}
@@ -616,8 +679,7 @@ public class SudokuSolver {
 							int counter = 1;
 							for (int k=boxI; k<(boxI+3); k++) {
 								for (int l=boxJ; l<(boxJ+3); l++) {
-									if (!(k == i && l == j) && p[k][l].size() >= 2
-											&& (p[k][l].contains(first) || p[k][l].contains(second))) {
+									if (!(k == i && l == j) && (p[k][l].contains(first) || p[k][l].contains(second))) {
 										counter ++;
 										foundRow = k;
 										foundCol = l;
@@ -626,20 +688,25 @@ public class SudokuSolver {
 							}
 							if (counter == 2) {
 								// double found, keep this double and remove others from probables of those boxes
-								if (p[i][j].size() > 2) {
-									p[i][j].clear();
-									p[i][j].add(first);
-									p[i][j].add(second);
+								if (p[i][j].contains(first) && p[i][j].contains(second)
+										&& p[foundRow][foundCol].contains(first)
+										&& p[foundRow][foundCol].contains(second)) {
+									printProbables();
+									if (p[i][j].size() > 2) {
+										p[i][j].clear();
+										p[i][j].add(first);
+										p[i][j].add(second);
+									}
+			
+									if (p[foundRow][foundCol].size() > 2) { 
+										p[foundRow][foundCol].clear();
+										p[foundRow][foundCol].add(first);
+										p[foundRow][foundCol].add(second);
+									}
+			
+									printProbables();
+									return;
 								}
-		
-								if (p[foundRow][foundCol].size() > 2) { 
-									p[foundRow][foundCol].clear();
-									p[foundRow][foundCol].add(first);
-									p[foundRow][foundCol].add(second);
-								}
-		
-								//printProbables();
-								return;
 							}
 						}
 					}
@@ -691,6 +758,10 @@ public class SudokuSolver {
 			}
 		}
 		System.out.print("\t");
+	}
+
+	private void printDups(int i, int j, int k, int l) {
+		System.err.println("Duplicate value " + a[i][j] + " found for a[" + i + "][" + j + "] & a[" + k + "][" + l + "]");		
 	}
 
 	public void setKnownValues() {
