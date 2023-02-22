@@ -1,19 +1,20 @@
 package com.muneer.sudoku;
 
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 /**
  * @author Muneer Ahmed Syed
- * @version 0.5
+ * @version 0.6
  * This class solves Sodoku puzzle
- * TODO: to process row & box and col & box combination
- * TODO: to process three probable (may not be needed)
- * TODO: other ways of elimination (refer www.extremesudoku.info)
+ * TODO: to process double box & row and double box & col combination
+ * TODO: any other ways of elimination (refer www.extremesudoku.info)
  * TODO: to try randomization if puzzle is not getting solved after too many iterations
  * TODO: optimize performance
  */
@@ -23,6 +24,7 @@ public class SudokuSolver {
 	private TreeSet<Integer> p[][];
 	//private int counter = 0;
 	private int tryc = 0;
+	private static final int MAX_TRY = 100;
 
 	private static final Integer N1 = 1;
 	private static final Integer N2 = 2;
@@ -58,8 +60,8 @@ public class SudokuSolver {
 	private void init() {
 		a = new int[9][9];
 		p = new TreeSet[9][9];
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
+		for (int i=0; i<9; i++) {
+			for (int j=0; j<9; j++) {
 				a[i][j] = 0;
 				initProbables(i, j);
 			}
@@ -137,22 +139,30 @@ public class SudokuSolver {
 		do {
 			solveUniqs();
 
-			for(int i=0; i<9; i++) {
-				solveDoubleProbableInRow(i);
-				solveDoubleProbableInRowReverse(i);
-			}
-			for(int j=0; j<9; j++) {
-				solveDoubleProbableInCol(j);
-				solveDoubleProbableInColReverse(j);
-			}
-			for(int i=0; i<9; i+=3) {
-				for(int j=0; j<9; j+=3) {
-					solveDoubleProbableInBox(i, j);
-					solveDoubleProbableInBoxReverse(i, j);
+			for (int i=0; i<9; i+=3) {
+				for (int j=0; j<9; j+=3) {
+					solveByBoxRowAndBoxCol(i, j);
 				}
 			}
-
-			exitAfterMaxTry();
+			for (int i=0; i<9; i++) {
+				solveDoubleProbableInRow(i);
+				solveDoubleProbableInRowReverse(i);
+				solveTripleProbableInRow(i);
+			}
+			for (int j=0; j<9; j++) {
+				solveDoubleProbableInCol(j);
+				solveDoubleProbableInColReverse(j);
+				solveTripleProbableInCol(j);
+				
+			}
+			for (int i=0; i<9; i+=3) {
+				for (int j=0; j<9; j+=3) {
+					solveByBoxRowAndBoxCol(i, j);
+					solveDoubleProbableInBox(i, j);
+					solveDoubleProbableInBoxReverse(i, j);
+					solveTripleProbableInBox(i, j);
+				}
+			}
 
 		} while(! isResolved());
 	}
@@ -170,13 +180,12 @@ public class SudokuSolver {
 
 	private void exitAfterMaxTry() {
 		tryc ++;
-		int maxTry = 10000;
 		//resetProbables();
 		if (tryc % 100000 == 0 ) {
 			System.out.println("Tried " + tryc + " iterations");
 			print();
 		}
-		if (tryc == maxTry) {
+		if (tryc == MAX_TRY) {
 			System.err.println("Tried and failed after " + tryc + " iterations");
 			print();
 			System.exit(3);
@@ -185,10 +194,11 @@ public class SudokuSolver {
 
 	private boolean isResolved() {
 		//print();
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
-				if(a[i][j] == 0) {
+		for (int i=0; i<9; i++) {
+			for (int j=0; j<9; j++) {
+				if (a[i][j] == 0) {
 					//resetProbables(i, j);
+					exitAfterMaxTry();
 					return false;
 				}
 			}
@@ -301,7 +311,7 @@ public class SudokuSolver {
 	}
 	
 	private void solveUniqs() {
-		for(int i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			solveUniqProbableInRow(i);
 			solveUniqProbableInRowReverse(i);
 
@@ -310,7 +320,7 @@ public class SudokuSolver {
 			}
 		}
 
-		for(int j=0; j<9; j++) {
+		for (int j=0; j<9; j++) {
 			solveUniqProbableInCol(j);
 			solveUniqProbableInColReverse(j);
 
@@ -334,7 +344,7 @@ public class SudokuSolver {
 	}
 
 	private void solveUniqProbable(int row, int col) {
-		if(a[row][col] == 0) {
+		if (a[row][col] == 0) {
 			if (p[row][col].size() == 1 ) {
 				setSolvedValue(row, col, p[row][col].first().intValue());
 			} else {
@@ -344,7 +354,7 @@ public class SudokuSolver {
 	}
 
 	private void solveUniqProbableInRow(int row) {
-		for(int j=0; j<9; j++) {
+		for (int j=0; j<9; j++) {
 			solveUniqProbable(row, j);
 		}
 	}
@@ -353,7 +363,7 @@ public class SudokuSolver {
 		for (int n=1; n<=9; n++) {
 			int counter = 0;
 			int foundCol = 10;
-			for(int j=0; j<9; j++) {
+			for (int j=0; j<9; j++) {
 				if (p[row][j].contains(n)) {
 					foundCol = j;
 					counter ++;
@@ -367,7 +377,7 @@ public class SudokuSolver {
 	}
 
 	private void solveUniqProbableInCol(int col) {
-		for(int i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			solveUniqProbable(i, col);
 		}
 	}
@@ -376,7 +386,7 @@ public class SudokuSolver {
 		for (int n=1; n<=9; n++) {
 			int counter = 0;
 			int foundRow = 10;
-			for(int i=0; i<9; i++) {
+			for (int i=0; i<9; i++) {
 				if (p[i][col].contains(n)) {
 					foundRow = i;
 					counter ++;
@@ -392,8 +402,8 @@ public class SudokuSolver {
 	private void solveUniqProbableInBox(int row, int col) {
 		int boxI = (row / 3) * 3;
 		int boxJ = (col / 3) * 3;
-		for(int i=boxI; i<(boxI+3); i++) {
-			for(int j=boxJ; j<(boxJ+3); j++) {
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
 				solveUniqProbable(i, j);
 			}
 		}
@@ -406,8 +416,8 @@ public class SudokuSolver {
 			int foundCol = 10;
 			int boxI = (row / 3) * 3;
 			int boxJ = (col / 3) * 3;
-			for(int i=boxI; i<(boxI+3); i++) {
-				for(int j=boxJ; j<(boxJ+3); j++) {
+			for (int i=boxI; i<(boxI+3); i++) {
+				for (int j=boxJ; j<(boxJ+3); j++) {
 					if (p[i][j].contains(n)) {
 						foundRow = i;
 						foundCol = j;
@@ -429,8 +439,8 @@ public class SudokuSolver {
 	}
 
 	private void resetProbables() {
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
+		for (int i=0; i<9; i++) {
+			for (int j=0; j<9; j++) {
 				resetProbables(i, j);
 			}
 		}
@@ -438,7 +448,7 @@ public class SudokuSolver {
 	}
 
 	private void resetProbables(int row, int col) {
-		if(a[row][col] == 0) {
+		if (a[row][col] == 0) {
 			if (p[row][col] == null || p[row][col].size() == 0) {
 				initProbables(row, col);
 			}
@@ -454,13 +464,13 @@ public class SudokuSolver {
 	}
 
 	private void eliminateRowUnProbables(int row, int col) {
-		for(int j=0; j<9; j++) {
+		for (int j=0; j<9; j++) {
 			p[row][j].remove(a[row][col]);
 		}
 	}
 	
 	private void eliminateColUnProbables(int row, int col) {
-		for(int i=0;i<9; i++) {
+		for (int i=0;i<9; i++) {
 			p[i][col].remove(a[row][col]);
 		}
 	}
@@ -468,21 +478,21 @@ public class SudokuSolver {
 	private void eliminateBoxUnProbables(int row, int col) {
 		int boxI = (row / 3) * 3;
 		int boxJ = (col / 3) * 3;
-		for(int i=boxI; i<(boxI+3); i++) {
-			for(int j=boxJ; j<(boxJ+3); j++) {
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
 				p[i][j].remove(a[row][col]);
 			}
 		}
 	}
 
 	private void solveDoubleProbableInRow(int row) {
-		for(int j=0; j<9; j++) {
+		for (int j=0; j<9; j++) {
 			if (p[row][j].size() == 2) {
 				// double probable candidate
 				boolean doubleFound = false;
 				int foundCol = 10;
 
-				for(int k=0; k<9; k++) {
+				for (int k=0; k<9; k++) {
 					if (k != j && p[row][k].size() == 2 && p[row][k].containsAll(p[row][j])) {
 						// double found
 						foundCol = k;
@@ -491,7 +501,7 @@ public class SudokuSolver {
 				}
 				if (doubleFound) {
 					// remove these probable from other elements of row
-					for(int k=0; k<9; k++) {
+					for (int k=0; k<9; k++) {
 						if (k != j && k != foundCol) {
 							p[row][k].removeAll(p[row][j]);
 						}
@@ -503,13 +513,13 @@ public class SudokuSolver {
 	}
 
 	private void solveDoubleProbableInCol(int col) {
-		for(int i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			if (p[i][col].size() == 2) {
 				// double probable candidate
 				boolean doubleFound = false;
 				int foundRow = 10;
 
-				for(int k=0; k<9; k++) {
+				for (int k=0; k<9; k++) {
 					if (k != i && p[k][col].size() == 2 && p[k][col].containsAll(p[i][col])) {
 						// double found
 						foundRow = k;
@@ -518,7 +528,7 @@ public class SudokuSolver {
 				}
 				if (doubleFound) {
 					// remove these probable from other elements of col
-					for(int k=0; k<9; k++) {
+					for (int k=0; k<9; k++) {
 						if (k != i && k != foundRow) {
 							p[k][col].removeAll(p[i][col]);
 						}
@@ -530,19 +540,20 @@ public class SudokuSolver {
 	}
 
 	private void solveDoubleProbableInBox(int row, int col) {
+		//printProbables();
 		int boxI = (row / 3) * 3;
 		int boxJ = (col / 3) * 3;
 
-		for(int i=boxI; i<(boxI+3); i++) {
-			for(int j=boxJ; j<(boxJ+3); j++) {
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
 				if (p[i][j].size() == 2) {
 					// double probable candidate
 					boolean doubleFound = false;
 					int foundRow = 10;
 					int foundCol = 10;
 
-					for(int k=boxI; k<(boxI+3); k++) {
-						for(int l=boxJ; l<(boxJ+3); l++) {
+					for (int k=boxI; k<(boxI+3); k++) {
+						for (int l=boxJ; l<(boxJ+3); l++) {
 							if (!(k == i && l == j) && p[k][l].size() == 2 && p[k][l].containsAll(p[i][j])) {
 								// double found
 								foundRow = k;
@@ -553,8 +564,8 @@ public class SudokuSolver {
 					}
 					if (doubleFound) {
 						// remove these probable from other elements of col
-						for(int k=boxI; k<(boxI+3); k++) {
-							for(int l=boxJ; l<(boxJ+3); l++) {
+						for (int k=boxI; k<(boxI+3); k++) {
+							for (int l=boxJ; l<(boxJ+3); l++) {
 								if (!(k == i && l == j) && !(k == foundRow && l == foundCol)) {
 									p[k][l].removeAll(p[i][j]);
 								}
@@ -568,7 +579,7 @@ public class SudokuSolver {
 	}
 
 	private void solveDoubleProbableInRowReverse(int row) {
-		for(int j=0; j<9; j++) {
+		for (int j=0; j<9; j++) {
 			solveDoubleProbableInRowReverse(row, j);
 		}
 	}
@@ -584,7 +595,7 @@ public class SudokuSolver {
 					int second = arr[y];
 					int foundCol = 10;
 					int counter = 1;
-					for(int k=0; k<9; k++) {
+					for (int k=0; k<9; k++) {
 						if (k != col && (p[row][k].contains(first) || p[row][k].contains(second))) {
 							counter ++;
 							foundCol = k;
@@ -621,7 +632,7 @@ public class SudokuSolver {
 	}
 
 	private void solveDoubleProbableInColReverse(int col) {
-		for(int i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			solveDoubleProbableInColReverse(i, col);
 		}
 	}
@@ -637,7 +648,7 @@ public class SudokuSolver {
 					int second = arr[y];
 					int foundRow = 10;
 					int counter = 1;
-					for(int k=0; k<9; k++) {
+					for (int k=0; k<9; k++) {
 						if (k != row && (p[k][col].contains(first) || p[k][col].contains(second))) {
 							counter ++;
 							foundRow = k;
@@ -699,7 +710,7 @@ public class SudokuSolver {
 								if (p[i][j].contains(first) && p[i][j].contains(second)
 										&& p[foundRow][foundCol].contains(first)
 										&& p[foundRow][foundCol].contains(second)) {
-									printProbables();
+									//printProbables();
 									if (p[i][j].size() > 2) {
 										p[i][j].clear();
 										p[i][j].add(first);
@@ -712,7 +723,7 @@ public class SudokuSolver {
 										p[foundRow][foundCol].add(second);
 									}
 			
-									printProbables();
+									//printProbables();
 									return;
 								}
 							}
@@ -723,6 +734,260 @@ public class SudokuSolver {
 		}
 	}
 
+	private void solveTripleProbableInRow(int row) {
+		//printProbables();
+		// first find all probable of row
+		TreeSet<Integer> rowPSet = new TreeSet<Integer>();
+		for (int j=0; j<9; j++) {
+			rowPSet.addAll(p[row][j]);
+		}
+
+		if (rowPSet.size() > 3) {
+			List<Integer> rowP = new ArrayList<Integer>(rowPSet);
+			// iterate 3
+			for (int k=0; k<rowP.size(); k++) {
+				for (int l=k+1; l<rowP.size(); l++) {
+					for (int m=l+1; m<rowP.size(); m++) {
+						Integer first = rowP.get(k);
+						Integer second = rowP.get(l);
+						Integer third = rowP.get(m);
+
+						int counter = 0;
+
+						Integer j1 = null;
+						Integer j2 = null;
+						Integer j3 = null;
+ 
+						for (int j=0; j<9; j++) {
+							if (p[row][j].contains(first) || p[row][j].contains(second) || p[row][j].contains(third)) {
+								List<Integer> nonP = new ArrayList<Integer>(p[row][j]);
+								nonP.remove(first);
+								nonP.remove(second);
+								nonP.remove(third);
+								if (nonP.isEmpty()) {
+									counter ++;
+
+									if (j1 == null) {
+										j1 = j;
+									} else if (j2 == null) {
+										j2 = j;
+									} else if (j3 == null) {
+										j3 = j;
+									}
+								}
+							}
+						}
+						if (counter == 3) {
+							// we found 3 probable, remove these from others
+							for (int j=0; j<9; j++) {
+								if (j != j1 && j != j2 && j != j3) {
+									p[row][j].remove(first);
+									p[row][j].remove(second);
+									p[row][j].remove(third);
+								}
+							}
+							//printProbables();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void solveTripleProbableInCol(int col) {
+		//printProbables();
+		// first find all probable of row
+		TreeSet<Integer> colPSet = new TreeSet<Integer>();
+		for (int i=0; i<9; i++) {
+			colPSet.addAll(p[i][col]);
+		}
+
+		if (colPSet.size() > 3) {
+			List<Integer> colP = new ArrayList<Integer>(colPSet);
+			// iterate 3
+			for (int k=0; k<colP.size(); k++) {
+				for (int l=k+1; l<colP.size(); l++) {
+					for (int m=l+1; m<colP.size(); m++) {
+						Integer first = colP.get(k);
+						Integer second = colP.get(l);
+						Integer third = colP.get(m);
+
+						int counter = 0;
+
+						Integer i1 = null;
+						Integer i2 = null;
+						Integer i3 = null;
+ 
+						for (int i=0; i<9; i++) {
+							if (p[i][col].contains(first) || p[i][col].contains(second) || p[i][col].contains(third)) {
+								List<Integer> nonP = new ArrayList<Integer>(p[i][col]);
+								nonP.remove(first);
+								nonP.remove(second);
+								nonP.remove(third);
+								if (nonP.isEmpty()) {
+									counter ++;
+
+									if (i1 == null) {
+										i1 = i;
+									} else if (i2 == null) {
+										i2 = i;
+									} else if (i3 == null) {
+										i3 = i;
+									}
+								}
+							}
+						}
+						if (counter == 3) {
+							// we found 3 probable, remove these from others
+							for (int i=0; i<9; i++) {
+								if (i != i1 && i != i2 && i != i3) {
+									p[i][col].remove(first);
+									p[i][col].remove(second);
+									p[i][col].remove(third);
+								}
+							}
+							//printProbables();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void solveTripleProbableInBox(int row, int col) {
+		//printProbables();
+		// first find all probable of box
+		TreeSet<Integer> boxPSet = new TreeSet<Integer>();
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
+				boxPSet.addAll(p[i][j]);
+			}
+		}
+
+		if (boxPSet.size() > 3) {
+			List<Integer> boxP = new ArrayList<Integer>(boxPSet);
+			// iterate 3
+			for (int k=0; k<boxP.size(); k++) {
+				for (int l=k+1; l<boxP.size(); l++) {
+					for (int m=l+1; m<boxP.size(); m++) {
+						Integer first = boxP.get(k);
+						Integer second = boxP.get(l);
+						Integer third = boxP.get(m);
+
+						int counter = 0;
+
+						Integer i1 = null;
+						Integer i2 = null;
+						Integer i3 = null;
+ 
+						Integer j1 = null;
+						Integer j2 = null;
+						Integer j3 = null;
+ 
+						for (int i=boxI; i<(boxI+3); i++) {
+							for (int j=boxJ; j<(boxJ+3); j++) {
+								if (p[i][j].contains(first) || p[i][j].contains(second) || p[i][j].contains(third)) {
+									List<Integer> nonP = new ArrayList<Integer>(p[i][j]);
+									nonP.remove(first);
+									nonP.remove(second);
+									nonP.remove(third);
+									if (nonP.isEmpty()) {
+										counter ++;
+	
+										if (i1 == null) {
+											i1 = i;
+										} else if (i2 == null) {
+											i2 = i;
+										} else if (i3 == null) {
+											i3 = i;
+										}
+
+										if (j1 == null) {
+											j1 = j;
+										} else if (j2 == null) {
+											j2 = j;
+										} else if (j3 == null) {
+											j3 = j;
+										}
+									}
+								}
+							}
+						}
+						if (counter == 3) {
+							// we found 3 probable, remove these from others
+							for (int i=boxI; i<(boxI+3); i++) {
+								for (int j=boxJ; j<(boxJ+3); j++) {
+									if (! (i == i1 && j == j1) && ! (i == i2 && j == j2) && ! (i == i3 && j == j3)) {
+										p[i][j].remove(first);
+										p[i][j].remove(second);
+										p[i][j].remove(third);
+									}
+								}
+							}
+							//printProbables();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void solveByBoxRowAndBoxCol(int row, int col) {
+		//printProbables();
+		// first find all probable of box
+		TreeSet<Integer> boxPSet = new TreeSet<Integer>();
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+
+		for (int i=boxI; i<(boxI+3); i++) {
+			for (int j=boxJ; j<(boxJ+3); j++) {
+				boxPSet.addAll(p[i][j]);
+			}
+		}
+
+		List<Integer> boxP = new ArrayList<Integer>(boxPSet);
+		for (int k=0; k<boxP.size(); k++) {
+			int pr = boxP.get(k);
+			int foundRow = 10;
+			int countRow = 0;
+			for (int i=boxI; i<(boxI+3); i++) {
+				if (p[i][boxJ].contains(pr) || p[i][boxJ+1].contains(pr) || p[i][boxJ+2].contains(pr) ) {
+					foundRow = i;
+					countRow++;	
+				}
+			}
+			if (countRow == 1) {
+				for (int j=0; j<9; j++) {
+					if (j != boxJ && j != boxJ+1 && j != boxJ+2) {
+						p[foundRow][j].remove(pr);
+					}
+				}
+				//printProbables();
+			}
+
+			int foundCol = 10;
+			int countCol = 0;
+			for (int j=boxJ; j<(boxJ+3); j++) {
+				if (p[boxI][j].contains(pr) || p[boxI+1][j].contains(pr) || p[boxI+2][j].contains(pr) ) {
+					foundCol = j;
+					countCol++;	
+				}
+			}
+			if (countCol == 1) {
+				for (int i=0; i<9; i++) {
+					if (i != boxI && i != boxI+1 && i != boxI+2) {
+						p[i][foundCol].remove(pr);
+					}
+				}
+				//printProbables();
+			}
+
+		}
+	}
+
 	private void print() {
 		printPuzzle();
 		printProbables();
@@ -730,10 +995,10 @@ public class SudokuSolver {
 
 	private void printPuzzle() {
 		System.out.println("------------------");
-		for(int i=0; i<9; i++) {
+		for (int i=0; i<9; i++) {
 			//System.out.print("|");
-			for(int j=0; j<9; j++) {
-				if(a[i][j] == 0) {
+			for (int j=0; j<9; j++) {
+				if (a[i][j] == 0) {
 					System.out.print(" ");
 				} else {
 					System.out.print(a[i][j]);
@@ -748,8 +1013,8 @@ public class SudokuSolver {
 	
 	private void printProbables() {
 		System.out.println("==================");
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
+		for (int i=0; i<9; i++) {
+			for (int j=0; j<9; j++) {
 				System.out.print("p" + i + j + "=");
 				printProbables(i, j);
 			}
@@ -758,8 +1023,8 @@ public class SudokuSolver {
 	}
 
 	private void printProbables(int row, int col) {
-		for(int k=1; k<=9; k++) {
-			if(p[row][col].contains(k)) {
+		for (int k=1; k<=9; k++) {
+			if (p[row][col].contains(k)) {
 				System.out.print(k);
 			} else {
 				System.out.print(" ");
