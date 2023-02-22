@@ -9,10 +9,11 @@ import java.util.TreeSet;
 
 /**
  * @author Muneer Ahmed Syed
- * @version 0.4
+ * @version 0.5
  * This class solves Sodoku puzzle
  * TODO: to process row & box and col & box combination
- * TODO: to process three probable
+ * TODO: to process three probable (may not be needed)
+ * TODO: other ways of elimination (refer www.extremesudoku.info)
  * TODO: to try randomization if puzzle is not getting solved after too many iterations
  * TODO: optimize performance
  */
@@ -40,8 +41,15 @@ public class SudokuSolver {
 
 	public static void main(String[] args) {
 		SudokuSolver sudokuSolver = new SudokuSolver();
-
-		sudokuSolver.readInputFromFile("/home/ahmedsye/sample.txt");
+		String inputFileName = null;
+		if (args.length != 0) {
+			inputFileName = args[0];
+		}
+		if (inputFileName == null || inputFileName.equals("")) {
+		System.err.println("Invalid input for file name");
+			System.exit(5);
+		}
+		sudokuSolver.readInputFromFile(inputFileName);
 		sudokuSolver.solve();
 
 	}
