@@ -108,12 +108,19 @@ public class SudokuSwingApp extends JFrame {
 		disableInputFields();
 		solveButton.setEnabled(false);
 
-		// Pass the 2D array to solver
-		SudokuSolver sudokuSolver = new SudokuSolver();
-		int[][] solvedArray = sudokuSolver.solve(inputArray);
+		try {
+			// Pass the 2D array to solver
+			SudokuSolver sudokuSolver = new SudokuSolver();
+			int[][] solvedArray = sudokuSolver.solve(inputArray);
 
-		// Update the UI with the solved results
-		updateUI(solvedArray);
+			// Update the UI with the solved results
+			updateUI(solvedArray);
+			exceptionLabel.setText("");
+		} catch (Exception e) {
+			// Handle exception by displaying the message in the exceptionPanel
+			exceptionLabel.setText(e.getMessage() != null ? e.getMessage() : e.getClass().getName());
+			exceptionLabel.setForeground(Color.RED);
+		}
 	}
 
 	private void updateUI(int[][] solvedArray) {
