@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -21,6 +22,7 @@ public class SudokuSwingApp extends JFrame {
 	private JTextField[][] sudokuGrid;
 	private JButton solveButton;
 	private JButton newButton;
+	private JLabel exceptionLabel; // New label for displaying sample text
 
 	public SudokuSwingApp() {
 		super("Sudoku Solver");
@@ -62,13 +64,27 @@ public class SudokuSwingApp extends JFrame {
 			}
 		});
 
+		exceptionLabel = new JLabel("Here will be place for exception message");
+		exceptionLabel.setForeground(Color.BLUE); // Adjusted color for the sample text
+
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(solveButton);
 		buttonPanel.add(newButton);
 
-		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(mainPanel, BorderLayout.CENTER);
-		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+		JPanel exceptionPanel = new JPanel();
+		exceptionPanel.add(exceptionLabel);
+
+		JPanel southPanel = new JPanel();
+		southPanel.setLayout(new BorderLayout());
+		southPanel.add(buttonPanel, BorderLayout.NORTH);
+		southPanel.add(exceptionPanel, BorderLayout.SOUTH);
+
+		JPanel contentPanel = new JPanel();
+		contentPanel.setLayout(new BorderLayout());
+		contentPanel.add(mainPanel, BorderLayout.CENTER);
+		contentPanel.add(southPanel, BorderLayout.SOUTH);
+
+		getContentPane().add(contentPanel);
 	}
 
 	private void solveSudoku() {
