@@ -58,9 +58,24 @@ public class SudokuSwingApp extends JFrame {
 	}
 
 	private void solveSudoku() {
-		// Add your Sudoku-solving logic here
-		// You need to implement the algorithm to solve the Sudoku puzzle based on user
-		// input
+		int[][] sudokuArray = new int[9][9];
+
+		// Read input values from UI
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				String text = sudokuGrid[i][j].getText();
+				sudokuArray[i][j] = (text.isEmpty()) ? 0 : Integer.parseInt(text);
+			}
+		}
+
+		// Pass the 2D array to another method for solving
+		solveSudokuPuzzle(sudokuArray);
+	}
+
+	private void solveSudokuPuzzle(int[][] sudokuArray) {
+		// Implement your Sudoku-solving logic here
+		// You can use the provided 2D array 'sudokuArray'
+		// Update the UI or display the solution as needed
 	}
 
 	public static void main(String[] args) {
