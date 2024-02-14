@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import fi.ishtech.sudoku.solver.SudokuSolver;
+
 public class SudokuSwingApp extends JFrame {
 
 	private static final long serialVersionUID = -240736298882872710L;
@@ -68,14 +70,12 @@ public class SudokuSwingApp extends JFrame {
 			}
 		}
 
-		// Pass the 2D array to another method for solving
-		solveSudokuPuzzle(sudokuArray);
-	}
+		// Pass the 2D array to solver
+		SudokuSolver sudokuSolver = new SudokuSolver();
+		int[][] solvedArray = sudokuSolver.solve(sudokuArray);
 
-	private void solveSudokuPuzzle(int[][] sudokuArray) {
-		// Implement your Sudoku-solving logic here
-		// You can use the provided 2D array 'sudokuArray'
-		// Update the UI or display the solution as needed
+		// Update the UI with the solved results
+		updateUI(solvedArray);
 	}
 
 	private void updateUI(int[][] solvedArray) {
