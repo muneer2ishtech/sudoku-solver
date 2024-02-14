@@ -40,7 +40,6 @@ public class SudokuSwingApp extends JFrame {
 			for (int j = 0; j < 9; j++) {
 				JTextField textField = new JTextField();
 				textField.setHorizontalAlignment(JTextField.CENTER);
-				textField.setEditable(false); // Make input fields uneditable
 				sudokuGrid[i][j] = textField;
 				mainPanel.add(textField);
 			}
@@ -79,15 +78,16 @@ public class SudokuSwingApp extends JFrame {
 			System.out.println("");
 		}
 
+		// Disable input fields and Solve button after clicking
+		disableInputFields();
+		solveButton.setEnabled(false);
+
 		// Pass the 2D array to solver
 		SudokuSolver sudokuSolver = new SudokuSolver();
 		int[][] solvedArray = sudokuSolver.solve(inputArray);
 
 		// Update the UI with the solved results
 		updateUI(solvedArray);
-
-		// Disable the Solve button after clicking
-		solveButton.setEnabled(false);
 	}
 
 	private void updateUI(int[][] solvedArray) {
@@ -108,6 +108,15 @@ public class SudokuSwingApp extends JFrame {
 				}
 
 				textField.setText(solvedValue);
+			}
+		}
+	}
+
+	private void disableInputFields() {
+		// Disable input fields
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				sudokuGrid[i][j].setEditable(false);
 			}
 		}
 	}
