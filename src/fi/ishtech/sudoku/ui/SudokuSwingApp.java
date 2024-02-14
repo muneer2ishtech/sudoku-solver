@@ -78,6 +78,15 @@ public class SudokuSwingApp extends JFrame {
 		// Update the UI or display the solution as needed
 	}
 
+	private void updateUI(int[][] solvedArray) {
+		// Update the UI with the solved results
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				sudokuGrid[i][j].setText(String.valueOf(solvedArray[i][j]));
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
