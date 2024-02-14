@@ -1,4 +1,4 @@
-package com.muneer.sudoku;
+package fi.ishtech.sudoku.solver;
 
 import java.util.List;
 import java.io.BufferedReader;
