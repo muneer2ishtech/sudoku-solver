@@ -60,7 +60,7 @@ public class SudokuSwingApp extends JFrame {
 	}
 
 	private void solveSudoku() {
-		int[][] inputArray = new int[9][9];
+		String[][] inputArray = new String[9][9];
 
 		System.out.println("Input:");
 
@@ -71,7 +71,7 @@ public class SudokuSwingApp extends JFrame {
 
 				System.out.print("[" + i + "][" + j + "]=" + (text == null || text.isEmpty() ? "\'\'" : text));
 
-				inputArray[i][j] = (text.isEmpty()) ? 0 : Integer.parseInt(text);
+				inputArray[i][j] = sudokuGrid[i][j].getText();
 			}
 			System.out.println("");
 		}
