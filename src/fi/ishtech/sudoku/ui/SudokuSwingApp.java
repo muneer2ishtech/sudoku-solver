@@ -62,12 +62,18 @@ public class SudokuSwingApp extends JFrame {
 	private void solveSudoku() {
 		int[][] sudokuArray = new int[9][9];
 
+		System.out.println("Input:");
+
 		// Read input values from UI
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				String text = sudokuGrid[i][j].getText();
+
+				System.out.print("[" + i + "][" + j + "]=" + (text == null || text.isEmpty() ? "\'\'" : text));
+
 				sudokuArray[i][j] = (text.isEmpty()) ? 0 : Integer.parseInt(text);
 			}
+			System.out.println("");
 		}
 
 		// Pass the 2D array to solver
