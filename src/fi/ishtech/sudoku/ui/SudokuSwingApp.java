@@ -1,6 +1,7 @@
 package fi.ishtech.sudoku.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -88,7 +89,15 @@ public class SudokuSwingApp extends JFrame {
 		// Update the UI with the solved results
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
-				sudokuGrid[i][j].setText(String.valueOf(solvedArray[i][j]));
+				JTextField textField = sudokuGrid[i][j];
+				textField.setText(String.valueOf(solvedArray[i][j]));
+
+				// Set font color based on input or solved value
+				if (textField.getText().isEmpty()) {
+					textField.setForeground(Color.RED);
+				} else {
+					textField.setForeground(Color.BLUE);
+				}
 			}
 		}
 	}
