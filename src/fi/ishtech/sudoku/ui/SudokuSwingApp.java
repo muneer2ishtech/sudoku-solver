@@ -65,7 +65,7 @@ public class SudokuSwingApp extends JFrame {
 		});
 
 		exceptionLabel = new JLabel("");
-		exceptionLabel.setForeground(Color.BLUE);
+		exceptionLabel.setForeground(Color.BLACK);
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(solveButton);
@@ -157,7 +157,7 @@ public class SudokuSwingApp extends JFrame {
 	private void resetSudoku() {
 		// reset the exceptionLabel
 		exceptionLabel = new JLabel("");
-		exceptionLabel.setForeground(Color.BLUE);
+		exceptionLabel.setForeground(Color.BLACK);
 
 		// Enable input fields
 		for (int i = 0; i < 9; i++) {
