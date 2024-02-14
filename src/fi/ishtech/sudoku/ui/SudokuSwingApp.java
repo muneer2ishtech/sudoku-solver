@@ -1,4 +1,4 @@
-package com.muneer.sudoku.ui;
+package fi.ishtech.sudoku.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 // import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.SwingConstants;
 
-import com.muneer.sudoku.SudokuSolver;
+import fi.ishtech.sudoku.solver.SudokuSolver;
 
 public class SudokuSwingApp
         implements ActionListener {
