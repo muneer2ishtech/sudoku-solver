@@ -19,6 +19,7 @@ public class SudokuSwingApp extends JFrame {
 	private static final long serialVersionUID = -240736298882872710L;
 
 	private JTextField[][] sudokuGrid;
+	private JButton solveButton;
 
 	public SudokuSwingApp() {
 		super("Sudoku Solver");
@@ -39,12 +40,13 @@ public class SudokuSwingApp extends JFrame {
 			for (int j = 0; j < 9; j++) {
 				JTextField textField = new JTextField();
 				textField.setHorizontalAlignment(JTextField.CENTER);
+				textField.setEditable(false); // Make input fields uneditable
 				sudokuGrid[i][j] = textField;
 				mainPanel.add(textField);
 			}
 		}
 
-		JButton solveButton = new JButton("Solve");
+		solveButton = new JButton("Solve");
 		solveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -83,6 +85,9 @@ public class SudokuSwingApp extends JFrame {
 
 		// Update the UI with the solved results
 		updateUI(solvedArray);
+
+		// Disable the Solve button after clicking
+		solveButton.setEnabled(false);
 	}
 
 	private void updateUI(int[][] solvedArray) {
