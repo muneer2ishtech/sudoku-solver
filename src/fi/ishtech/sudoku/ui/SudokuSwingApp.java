@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -42,6 +43,15 @@ public class SudokuSwingApp extends JFrame {
 				JTextField textField = new JTextField();
 				textField.setHorizontalAlignment(JTextField.CENTER);
 				sudokuGrid[i][j] = textField;
+
+				// Add a border to create a visual separation for 3x3 blocks
+				int top = (i % 3 == 0) ? 2 : 0;
+				int left = (j % 3 == 0) ? 2 : 0;
+				int bottom = (i == 8) ? 2 : 0;
+				int right = (j == 8) ? 2 : 0;
+
+				textField.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, Color.GRAY));
+
 				mainPanel.add(textField);
 			}
 		}
