@@ -20,6 +20,7 @@ public class SudokuSwingApp extends JFrame {
 
 	private JTextField[][] sudokuGrid;
 	private JButton solveButton;
+	private JButton newButton;
 
 	public SudokuSwingApp() {
 		super("Sudoku Solver");
@@ -53,8 +54,17 @@ public class SudokuSwingApp extends JFrame {
 			}
 		});
 
+		newButton = new JButton("New");
+		newButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				resetSudoku();
+			}
+		});
+
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(solveButton);
+		buttonPanel.add(newButton);
 
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(mainPanel, BorderLayout.CENTER);
@@ -119,6 +129,20 @@ public class SudokuSwingApp extends JFrame {
 				sudokuGrid[i][j].setEditable(false);
 			}
 		}
+	}
+
+	private void resetSudoku() {
+		// Enable input fields
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				sudokuGrid[i][j].setEditable(true);
+				sudokuGrid[i][j].setText("");
+				sudokuGrid[i][j].setForeground(Color.BLACK); // Reset font color to default
+			}
+		}
+
+		// Enable Solve button
+		solveButton.setEnabled(true);
 	}
 
 	public static void main(String[] args) {
