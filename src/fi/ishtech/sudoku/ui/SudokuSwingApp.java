@@ -88,6 +88,10 @@ public class SudokuSwingApp extends JFrame {
 	}
 
 	private void solveSudoku() {
+		// Disable input fields and Solve button after clicking
+		disableInputFields();
+		solveButton.setEnabled(false);
+
 		String[][] inputArray = new String[9][9];
 
 		System.out.println("Input:");
@@ -103,10 +107,6 @@ public class SudokuSwingApp extends JFrame {
 			}
 			System.out.println("");
 		}
-
-		// Disable input fields and Solve button after clicking
-		disableInputFields();
-		solveButton.setEnabled(false);
 
 		try {
 			// Pass the 2D array to solver
