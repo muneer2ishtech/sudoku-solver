@@ -73,7 +73,7 @@ public class SudokuSwingApp extends JFrame {
 
 				System.out.print("[" + i + "][" + j + "]=" + (text == null || text.isEmpty() ? "\'\'" : text));
 
-				inputArray[i][j] = sudokuGrid[i][j].getText();
+				inputArray[i][j] = text;
 			}
 			System.out.println("");
 		}
