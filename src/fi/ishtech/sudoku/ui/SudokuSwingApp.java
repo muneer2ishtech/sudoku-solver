@@ -89,13 +89,8 @@ public class SudokuSwingApp extends JFrame {
 		}
 
 		// Disable input fields and Solve button after clicking
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				disableInputFields();
-				solveButton.setEnabled(false);
-			}
-		});
+		disableInputFields();
+		solveButton.setEnabled(false);
 
 		// Pass the 2D array to solver
 		SudokuSolver sudokuSolver = new SudokuSolver();
