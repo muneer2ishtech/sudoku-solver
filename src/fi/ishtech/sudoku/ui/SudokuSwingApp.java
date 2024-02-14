@@ -90,14 +90,19 @@ public class SudokuSwingApp extends JFrame {
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				JTextField textField = sudokuGrid[i][j];
-				textField.setText(String.valueOf(solvedArray[i][j]));
+				String currentValue = textField.getText();
+				String solvedValue = String.valueOf(solvedArray[i][j]);
 
 				// Set font color based on input or solved value
-				if (textField.getText().isEmpty()) {
+				if (!currentValue.isEmpty()) {
+					// User-input value
 					textField.setForeground(Color.RED);
 				} else {
+					// Solved value
 					textField.setForeground(Color.BLUE);
 				}
+
+				textField.setText(solvedValue);
 			}
 		}
 	}
