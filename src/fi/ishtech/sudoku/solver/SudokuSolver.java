@@ -11,14 +11,16 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 /**
+ * This class solves Sudoku puzzle<br>
+ *
  * @author Muneer Ahmed Syed
  * @version 0.8
- * This class solves Sodoku puzzle
- * TODO: improve code quality of double box & row and double box & col combination
- * (functionally fine, too much repeated lines of code)
- * TODO: any other ways of elimination (refer www.extremesudoku.info)
- * TODO: to try randomization if puzzle is not getting solved after too many iterations
- * TODO: optimize performance
+ *
+ * TODO: improve code quality of double box & row and double box & col combination<br>
+ * (functionally fine, too much repeated lines of code)<br>
+ * TODO: any other ways of elimination (refer www.extremesudoku.info)<br>
+ * TODO: to try randomization if puzzle is not getting solved after too many iterations<br>
+ * TODO: optimize performance<br>
  */
 public class SudokuSolver {
 
