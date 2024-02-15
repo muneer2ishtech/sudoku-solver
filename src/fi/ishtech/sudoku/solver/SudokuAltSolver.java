@@ -23,6 +23,10 @@ public class SudokuAltSolver {
 		this(readInputFromStrArray(input));
 	}
 
+	private static IntEnum[][] readInputFromStrArray(String[][] input) {
+		return IntEnum.fromStringArray(input);
+	}
+
 	public int[][] solve() {
 		result = IntEnum.deepClone(input);
 		printResultInt();
@@ -33,10 +37,6 @@ public class SudokuAltSolver {
 		// TODO
 
 		return IntEnum.toIntArray(result);
-	}
-
-	private static IntEnum[][] readInputFromStrArray(String[][] input) {
-		return IntEnum.fromStringArray(input);
 	}
 
 	@SuppressWarnings("unchecked")
