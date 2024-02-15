@@ -25,6 +25,7 @@ public class SudokuAltSolver {
 
 	public int[][] solve() {
 		result = IntEnum.deepClone(input);
+		printResultInt();
 		printProbables();
 
 		resetProbables();
@@ -67,6 +68,19 @@ public class SudokuAltSolver {
 	private void printProbables() {
 		if (printLogs) {
 			IntEnum.print(probs);
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void printResult() {
+		if (printLogs) {
+			IntEnum.print(result);
+		}
+	}
+
+	private void printResultInt() {
+		if (printLogs) {
+			IntEnum.printInt(result);
 		}
 	}
 
