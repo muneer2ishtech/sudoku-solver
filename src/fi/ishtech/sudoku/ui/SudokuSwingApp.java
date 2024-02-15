@@ -115,6 +115,8 @@ public class SudokuSwingApp extends JFrame {
 
 			// Update the UI with the solved results
 			updateUI(solvedArray);
+
+			// Clear any previous exception message
 			exceptionLabel.setText("");
 		} catch (Exception e) {
 			// Handle exception by displaying the message in the exceptionPanel
@@ -159,7 +161,7 @@ public class SudokuSwingApp extends JFrame {
 		exceptionLabel = new JLabel("");
 		exceptionLabel.setForeground(Color.BLACK);
 
-		// Enable input fields
+		// Enable input fields and clear their text
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				sudokuGrid[i][j].setEditable(true);
