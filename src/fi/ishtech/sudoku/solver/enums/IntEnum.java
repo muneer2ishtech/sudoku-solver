@@ -79,19 +79,14 @@ public enum IntEnum {
 	}
 
 	public static int[][] toIntArray(IntEnum[][] e) {
-		if (e == null) {
-			return null;
-		}
-
-		int[][] result = new int[e.length][e[0].length];
-
-		for (int i = 0; i < e.length; i++) {
-			for (int j = 0; j < e[i].length; i++) {
-				result[i][j] = e[i][j].getValue();
-			}
-		}
-
-		return result;
+		// @formatter:off
+		return (e == null) ? null :
+				IntStream.range(0, e.length)
+						.mapToObj(i -> IntStream.range(0, e[i].length)
+								.map(j -> e[i][j].getValue())
+								.toArray())
+						.toArray(int[][]::new);
+		// @formatter:on
 	}
 
 	public static Set<Integer> toSetOfIntegers(EnumSet<IntEnum> es) {
