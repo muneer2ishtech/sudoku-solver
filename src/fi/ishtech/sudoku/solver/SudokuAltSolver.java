@@ -1,6 +1,8 @@
 package fi.ishtech.sudoku.solver;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import fi.ishtech.sudoku.solver.enums.IntEnum;
@@ -51,7 +53,11 @@ public class SudokuAltSolver {
 			printResultInt();
 		}
 		// TODO
-		return true;
+		return !anyNullsInResult();
+	}
+
+	private boolean anyNullsInResult() {
+		return Arrays.stream(result).flatMap(Arrays::stream).anyMatch(Objects::isNull);
 	}
 
 	private void solveUniqs(boolean exitOnSolved) {
