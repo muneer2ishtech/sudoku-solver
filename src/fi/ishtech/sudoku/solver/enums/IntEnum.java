@@ -1,10 +1,8 @@
 package fi.ishtech.sudoku.solver.enums;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public enum IntEnum {
 
@@ -55,10 +53,8 @@ public enum IntEnum {
 		}
 	}
 
-	private static final Set<IntEnum> all = Collections.unmodifiableSet(EnumSet.allOf(IntEnum.class));
-
-	public static Set<IntEnum> all() {
-		return all;
+	public static EnumSet<IntEnum> all() {
+		return EnumSet.allOf(IntEnum.class);
 	}
 
 }
