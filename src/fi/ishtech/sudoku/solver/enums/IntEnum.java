@@ -48,6 +48,10 @@ public enum IntEnum {
 						"Invalid value(" + value + ") for IntEnum. Value must be between 1 and 9 (inclusive)."));
 	}
 
+	public static IntEnum fromValue(String value) {
+		return value == null || value.isBlank() ? null : fromValue(Integer.parseInt(value));
+	}
+
 	public static EnumSet<IntEnum> all() {
 		return EnumSet.allOf(IntEnum.class);
 	}
