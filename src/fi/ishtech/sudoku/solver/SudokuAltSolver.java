@@ -10,6 +10,8 @@ public class SudokuAltSolver {
 	private final EnumSet<IntEnum>[][] probs;
 	private final IntEnum[][] input;
 
+	private IntEnum[][] result;
+
 	public SudokuAltSolver(IntEnum[][] input) {
 		this.input = input;
 		this.probs = initProbables();
@@ -20,13 +22,14 @@ public class SudokuAltSolver {
 	}
 
 	public int[][] solve() {
+		result = IntEnum.deepClone(input);
 		printProbables();
 
 		resetProbables();
 
 		// TODO
 
-		return IntEnum.toIntArray(input);
+		return IntEnum.toIntArray(result);
 	}
 
 	private static IntEnum[][] readInputFromStrArray(String[][] input) {
