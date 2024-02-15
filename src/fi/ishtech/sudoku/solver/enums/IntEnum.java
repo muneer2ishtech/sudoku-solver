@@ -84,7 +84,7 @@ public enum IntEnum {
 		return (e == null) ? null :
 				Arrays.stream(e)
 					.map(row -> Arrays.stream(row)
-							.mapToInt(IntEnum::getValue)
+							.mapToInt(IntEnum::toInt)
 							.toArray())
 					.toArray(int[][]::new);
 		// @formatter:on
