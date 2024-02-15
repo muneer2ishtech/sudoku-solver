@@ -12,6 +12,8 @@ public class SudokuAltSolver {
 
 	private IntEnum[][] result;
 
+	private boolean printLogs = true;
+
 	public SudokuAltSolver(IntEnum[][] input) {
 		this.input = input;
 		this.probs = initProbables();
@@ -63,7 +65,9 @@ public class SudokuAltSolver {
 	}
 
 	private void printProbables() {
-		IntEnum.print(probs);
+		if (printLogs) {
+			IntEnum.print(probs);
+		}
 	}
 
 	private boolean isValid() {
