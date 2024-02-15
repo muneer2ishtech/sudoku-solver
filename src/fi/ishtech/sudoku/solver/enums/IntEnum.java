@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public enum IntEnum {
 
@@ -52,6 +53,17 @@ public enum IntEnum {
 
 	public static IntEnum fromValue(String value) {
 		return value == null || value.isBlank() ? null : fromValue(Integer.parseInt(value));
+	}
+
+	public static IntEnum[][] fromStringArray(String[][] str) {
+		// @formatter:off
+		return str == null ? null
+				: IntStream.range(0, str.length)
+					.mapToObj(i -> IntStream.range(0, str[i].length)
+						.mapToObj(j -> IntEnum.fromValue(str[i][j]))
+						.toArray(IntEnum[]::new))
+					.toArray(IntEnum[][]::new);
+		// @formatter:on
 	}
 
 	public static EnumSet<IntEnum> all() {
