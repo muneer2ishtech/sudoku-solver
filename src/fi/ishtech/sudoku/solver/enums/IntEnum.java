@@ -184,6 +184,36 @@ public enum IntEnum {
 		}
 	}
 
+	public static void printInt(EnumSet<IntEnum>[][] setArray) {
+		if (setArray == null) {
+			System.out.println(setArray);
+		} else {
+			int rows = setArray.length;
+			int cols = setArray[0].length;
+
+			StringBuilder sb = new StringBuilder();
+			sb.append('[');
+			for (int i = 0; i < rows; i++) {
+				sb.append("\n[");
+				for (int j = 0; j < cols; j++) {
+					sb.append(IntEnum.toSetOfIntegers(setArray[i][j]));
+					if (j == cols - 1) {
+						sb.append(']');
+					} else {
+						sb.append(',');
+					}
+				}
+				if (i == rows - 1) {
+					sb.append("\n]");
+				} else {
+					sb.append(",");
+				}
+			}
+
+			System.out.println(sb.toString());
+		}
+	}
+
 	public static IntEnum[][] deepClone(IntEnum[][] input) {
 		if (input == null) {
 			return null;
