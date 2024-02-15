@@ -42,9 +42,10 @@ public class SudokuAltSolver {
 	}
 
 	private void solve(boolean exitOnSolved) {
-		resetProbables();
 
 		do {
+			resetProbables();
+
 			solveUniqs(exitOnSolved);
 
 			tryc++;
