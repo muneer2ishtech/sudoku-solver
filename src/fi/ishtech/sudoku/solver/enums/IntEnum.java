@@ -3,6 +3,8 @@ package fi.ishtech.sudoku.solver.enums;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public enum IntEnum {
 
@@ -41,16 +43,9 @@ public enum IntEnum {
 	}
 
 	public static IntEnum fromValue(Integer value) {
-		if (value == null) {
-			return null;
-		}
-
-		if (lookup.containsKey(value)) {
-			return lookup.get(value);
-		} else {
-			throw new RuntimeException(
-					"Invalid value(" + value + ") for IntEnum. Value must be between 1 and 9 (inclusive).");
-		}
+		return value == null ? null
+				: Optional.ofNullable(lookup.get(value)).orElseThrow(() -> new NoSuchElementException(
+						"Invalid value(" + value + ") for IntEnum. Value must be between 1 and 9 (inclusive)."));
 	}
 
 	public static EnumSet<IntEnum> all() {
