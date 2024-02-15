@@ -38,6 +38,80 @@ public class SudokuAltSolver {
 		return IntEnum.toIntArray(result);
 	}
 
+	private void solve(boolean exitOnSolved) {
+		resetProbables();
+
+		do {
+			solveUniqs(exitOnSolved);
+		} while (!isResolved(exitOnSolved));
+	}
+
+	private boolean isResolved(boolean exitOnSolved) {
+		// TODO
+		return true;
+	}
+
+	private void solveUniqs(boolean exitOnSolved) {
+		for (int i = 0; i < 9; i++) {
+			solveUniqInRow(i);
+		}
+
+		for (int j = 0; j < 9; j++) {
+			solveUniqInCol(j);
+		}
+
+		for (int boxI = 0; boxI < 9; boxI += 3) {
+			for (int boxJ = 0; boxJ < 9; boxJ += 3) {
+				solveUniqInBox(boxI, boxJ);
+			}
+		}
+
+		isResolved(exitOnSolved);
+	}
+
+	private void solveUniqProbable(int row, int col) {
+		if (result[row][col] == null) {
+			if (probs[row][col].size() == 1) {
+				result[row][col] = probs[row][col].stream().findFirst().get();
+				probs[row][col].clear();
+			}
+		}
+	}
+
+	private void solveUniqInRow(int row) {
+		solveUniqProbableInRow(row);
+	}
+
+	private void solveUniqProbableInRow(int row) {
+		for (int j = 0; j < 9; j++) {
+			solveUniqProbable(row, j);
+		}
+	}
+
+	private void solveUniqInCol(int col) {
+		solveUniqProbableInCol(col);
+	}
+
+	private void solveUniqProbableInCol(int col) {
+		for (int i = 0; i < 9; i++) {
+			solveUniqProbable(i, col);
+		}
+	}
+
+	private void solveUniqInBox(int row, int col) {
+		solveUniqProbableInBox(row, col);
+	}
+
+	private void solveUniqProbableInBox(int row, int col) {
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+		for (int i = boxI; i < (boxI + 3); i++) {
+			for (int j = boxJ; j < (boxJ + 3); j++) {
+				solveUniqProbable(i, j);
+			}
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private EnumSet<IntEnum>[][] initProbables() {
 		// @formatter:off
