@@ -7,16 +7,16 @@ import fi.ishtech.sudoku.solver.enums.IntEnum;
 
 public class SudokuAltSolver {
 
-	public IntEnum[][] solve(String[][] input) {
+	public int[][] solve(String[][] input) {
 		return solve(readInputFromStrArray(input));
 	}
 
-	public IntEnum[][] solve(IntEnum[][] input) {
+	public int[][] solve(IntEnum[][] input) {
 		initProbables();
 
 		// TODO
 
-		return input;
+		return IntEnum.toIntArray(input);
 	}
 
 	public IntEnum[][] readInputFromStrArray(String[][] input) {
