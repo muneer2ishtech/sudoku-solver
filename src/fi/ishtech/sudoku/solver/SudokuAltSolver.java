@@ -15,6 +15,7 @@ public class SudokuAltSolver {
 	private IntEnum[][] result;
 
 	private boolean printLogs = true;
+	private int tryc = 0;
 
 	public SudokuAltSolver(IntEnum[][] input) {
 		this.input = input;
@@ -45,13 +46,21 @@ public class SudokuAltSolver {
 
 		do {
 			solveUniqs(exitOnSolved);
+
+			tryc++;
 		} while (!isResolved(exitOnSolved));
 	}
 
 	private boolean isResolved(boolean exitOnSolved) {
 		if (printLogs) {
+			System.out.println("Number of tries:" + tryc);
 			printResultInt();
 		}
+
+		if (tryc == 20) {
+			throw new RuntimeException("Failed after " + tryc);
+		}
+
 		// TODO
 		return !anyNullsInResult();
 	}
