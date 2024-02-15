@@ -1,7 +1,7 @@
 package fi.ishtech.sudoku.solver;
 
 import java.util.EnumSet;
-import java.util.NoSuchElementException;
+import java.util.stream.IntStream;
 
 import fi.ishtech.sudoku.solver.enums.IntEnum;
 
