@@ -192,7 +192,10 @@ public class SudokuSwingApp extends JFrame {
 		@Override
 		public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr)
 				throws BadLocationException {
-			if (string.isEmpty() || string.matches("[0-9]")) {
+			String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+			String newText = currentText.substring(0, offset) + string + currentText.substring(offset);
+
+			if (isValidInput(newText)) {
 				super.insertString(fb, offset, string, attr);
 			}
 		}
@@ -200,9 +203,18 @@ public class SudokuSwingApp extends JFrame {
 		@Override
 		public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
 				throws BadLocationException {
-			if (text.isEmpty() || text.matches("[0-9]")) {
+			String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+			String newText = currentText.substring(0, offset) + text + currentText.substring(offset + length);
+
+			if (isValidInput(newText)) {
 				super.replace(fb, offset, length, text, attrs);
 			}
+		}
+
+		private boolean isValidInput(String text) {
+			// Check if the resulting text is a single digit between 1 and 9 or an empty
+			// string
+			return text.matches("[1-9]") || text.isEmpty();
 		}
 	}
 
