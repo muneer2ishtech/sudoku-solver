@@ -94,4 +94,17 @@ public enum IntEnum {
 		return es == null ? null : es.stream().map(IntEnum::getValue).collect(Collectors.toSet());
 	}
 
+	public static void print(EnumSet<IntEnum>[][] setArray) {
+		// @formatter:off
+		Arrays.stream(setArray)
+				.map(row -> Arrays.stream(row)
+						.map(set -> set.stream().map(IntEnum::toString).toArray(String[]::new))
+						.toArray(String[][]::new))
+				.forEach(row -> {
+					Arrays.stream(row).forEach(set -> System.out.print(Arrays.toString(set) + " "));
+					System.out.println();
+				});
+		// @formatter:on
+	}
+
 }
