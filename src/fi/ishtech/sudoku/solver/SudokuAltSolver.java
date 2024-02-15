@@ -137,18 +137,23 @@ public class SudokuAltSolver {
 		// @formatter:on
 
 		for (IntEnum e : combined) {
-			int count = 0;
-			int foundCol = -1;
-			for (int j = 0; j < 9; j++) {
-				if (probs[row][j].contains(e)) {
-					count++;
-					foundCol = j;
-				}
-			}
+			// @formatter:off
+			long count = Arrays.stream(probs[row])
+								.filter(set -> set.contains(e))
+								.count();
+			// @formatter:on
 
 			if (count == 1) {
 				// found only once
-				result[row][foundCol] = e; // can you assign directly or need to do IntEnum.fromValue(e.getValue())
+				// @formatter:off
+		    	int foundCol = Arrays.asList(probs[row])
+		    						.indexOf(Arrays.stream(probs[row])
+		    								.filter(set -> set.contains(e))
+		    								.findFirst()
+		    								.orElse(null));
+				// @formatter:on
+
+				result[row][foundCol] = e;
 				resetProbables(row, foundCol);
 			} else {
 				// found more than once
