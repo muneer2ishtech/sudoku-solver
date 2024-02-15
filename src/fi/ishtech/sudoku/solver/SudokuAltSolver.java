@@ -46,6 +46,10 @@ public class SudokuAltSolver {
 		// @formatter:on
 	}
 
+	private void printProbables() {
+		IntEnum.print(probs);
+	}
+
 	private boolean isValid() {
 		// TODO
 
