@@ -184,4 +184,21 @@ public enum IntEnum {
 		}
 	}
 
+	public static IntEnum[][] deepClone(IntEnum[][] input) {
+		if (input == null) {
+			return null;
+		}
+
+		int rows = input.length;
+		int cols = input[0].length;
+		IntEnum[][] result = new IntEnum[rows][cols];
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				result[i][j] = input[i][j] == null ? null : IntEnum.fromValue(input[i][j].getValue());
+			}
+		}
+
+		return result;
+	}
+
 }
