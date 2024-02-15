@@ -96,6 +96,10 @@ public class SudokuAltSolver {
 			solveUniqProbableInRowReverse(i);
 		}
 
+		for (int j = 0; j < 9; j++) {
+			solveUniqProbableInColReverse(j);
+		}
+
 		isResolved(exitOnSolved);
 	}
 
@@ -147,6 +151,35 @@ public class SudokuAltSolver {
 
 	private void solveUniqInCol(int col) {
 		solveUniqProbableInCol(col);
+	}
+
+	private void solveUniqProbableInColReverse(int col) {
+		// @formatter:off
+		Set<IntEnum> combined = Arrays.stream(probs)
+				.map(row -> row[col])
+				.collect(()
+						-> EnumSet.noneOf(IntEnum.class), EnumSet::addAll, EnumSet::addAll);
+
+		// @formatter:on
+
+		for (IntEnum e : combined) {
+			int count = 0;
+			int foundRow = -1;
+			for (int i = 0; i < 9; i++) {
+				if (probs[i][col].contains(e)) {
+					count++;
+					foundRow = i;
+				}
+			}
+
+			if (count == 1) {
+				// found only once
+				result[foundRow][col] = e; // can you assign directly or need to do IntEnum.fromValue(e.getValue())
+				resetProbables(foundRow, col);
+			} else {
+				// found more than once
+			}
+		}
 	}
 
 	private void solveUniqProbableInCol(int col) {
