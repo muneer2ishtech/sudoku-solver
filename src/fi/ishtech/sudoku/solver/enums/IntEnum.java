@@ -56,4 +56,12 @@ public enum IntEnum {
 		return EnumSet.allOf(IntEnum.class);
 	}
 
+	public static Integer toInteger(IntEnum e) {
+		return e == null ? null : e.getValue();
+	}
+
+	public static int toInt(IntEnum e) {
+		return e == null ? 0 : e.getValue();
+	}
+
 }
