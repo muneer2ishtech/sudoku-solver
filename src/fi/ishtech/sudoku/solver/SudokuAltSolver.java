@@ -24,9 +24,9 @@ public class SudokuAltSolver {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void initProbables() {
+	private EnumSet<IntEnum>[][] initProbables() {
 		// @formatter:off
-		EnumSet<IntEnum>[][] probs = IntStream.range(0, 9)
+		return IntStream.range(0, 9)
 				.mapToObj(i -> IntStream.range(0, 9)
 						.mapToObj(j -> IntEnum.all())
 						.toArray(EnumSet[]::new))
