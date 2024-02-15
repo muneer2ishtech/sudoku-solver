@@ -148,7 +148,12 @@ public class SudokuSolver {
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				if (!input[i][j].trim().isEmpty()) {
-					a[i][j] = Integer.parseInt(input[i][j].trim());
+					try {
+						a[i][j] = Integer.parseInt(input[i][j].trim());
+					} catch (NumberFormatException e) {
+						throw new NumberFormatException(
+								"Invalid input '" + input[i][j] + "' at row:" + (i + 1) + ", col:" + (j + 1));
+					}
 				}
 			}
 		}
