@@ -22,8 +22,8 @@ public class SudokuAltSolver {
 	public IntEnum[][] readInputFromStrArray(String[][] input) {
 		// @formatter:off
 		return input == null ? null
-				: IntStream.range(0, 9)
-					.mapToObj(i -> IntStream.range(0, 9)
+				: IntStream.range(0, input.length)
+					.mapToObj(i -> IntStream.range(0, input[i].length)
 						.mapToObj(j -> IntEnum.fromValue(input[i][j]))
 						.toArray(IntEnum[]::new))
 					.toArray(IntEnum[][]::new);
