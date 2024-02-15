@@ -46,6 +46,21 @@ public class SudokuAltSolver {
 		// @formatter:on
 	}
 
+	private void resetProbables() {
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				resetProbables(i, j);
+			}
+		}
+		printProbables();
+	}
+
+	private void resetProbables(int row, int col) {
+		if (input[row][col] != null) {
+			probs[row][col].clear();
+		}
+	}
+
 	private void printProbables() {
 		IntEnum.print(probs);
 	}
