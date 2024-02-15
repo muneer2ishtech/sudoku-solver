@@ -63,6 +63,32 @@ public class SudokuAltSolver {
 	private void resetProbables(int row, int col) {
 		if (result[row][col] != null) {
 			probs[row][col].clear();
+
+			eliminateRowUnProbables(row, col);
+			eliminateColUnProbables(row, col);
+			eliminateBoxUnProbables(row, col);
+		}
+	}
+
+	private void eliminateRowUnProbables(int row, int col) {
+		for (int j = 0; j < 9; j++) {
+			probs[row][j].remove(result[row][col]);
+		}
+	}
+
+	private void eliminateColUnProbables(int row, int col) {
+		for (int i = 0; i < 9; i++) {
+			probs[i][col].remove(result[row][col]);
+		}
+	}
+
+	private void eliminateBoxUnProbables(int row, int col) {
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+		for (int i = boxI; i < (boxI + 3); i++) {
+			for (int j = boxJ; j < (boxJ + 3); j++) {
+				probs[i][j].remove(result[row][col]);
+			}
 		}
 	}
 
