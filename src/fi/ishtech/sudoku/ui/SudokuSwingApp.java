@@ -12,6 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 import fi.ishtech.sudoku.solver.SudokuSolver;
 
@@ -41,8 +45,7 @@ public class SudokuSwingApp extends JFrame {
 
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
-				JTextField textField = new JTextField();
-				textField.setHorizontalAlignment(JTextField.CENTER);
+				JTextField textField = createTextField();
 				sudokuGrid[i][j] = textField;
 				mainPanel.add(textField);
 			}
@@ -172,6 +175,35 @@ public class SudokuSwingApp extends JFrame {
 
 		// Enable Solve button
 		solveButton.setEnabled(true);
+	}
+
+	private JTextField createTextField() {
+		JTextField textField = new JTextField();
+		textField.setHorizontalAlignment(JTextField.CENTER);
+
+		// Add a DocumentFilter to restrict input to a single digit
+		AbstractDocument document = (AbstractDocument) textField.getDocument();
+		document.setDocumentFilter(new SingleDigitDocumentFilter());
+
+		return textField;
+	}
+
+	private class SingleDigitDocumentFilter extends DocumentFilter {
+		@Override
+		public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr)
+				throws BadLocationException {
+			if (string.isEmpty() || string.matches("[0-9]")) {
+				super.insertString(fb, offset, string, attr);
+			}
+		}
+
+		@Override
+		public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+				throws BadLocationException {
+			if (text.isEmpty() || text.matches("[0-9]")) {
+				super.replace(fb, offset, length, text, attrs);
+			}
+		}
 	}
 
 	public static void main(String[] args) {
