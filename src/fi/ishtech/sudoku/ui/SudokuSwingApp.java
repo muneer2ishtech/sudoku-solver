@@ -158,7 +158,7 @@ public class SudokuSwingApp extends JFrame {
 
 	private void resetSudoku() {
 		// reset the exceptionLabel
-		exceptionLabel = new JLabel("");
+		exceptionLabel.setText("");
 		exceptionLabel.setForeground(Color.BLACK);
 
 		// Enable input fields and clear their text
