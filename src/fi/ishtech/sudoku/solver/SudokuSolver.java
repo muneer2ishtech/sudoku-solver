@@ -1,10 +1,5 @@
 package fi.ishtech.sudoku.solver;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,27 +40,6 @@ public class SudokuSolver {
 		// setTestKnownValues();
 	}
 
-	public static void main(String[] args) {
-		SudokuSolver sudokuSolver = new SudokuSolver();
-		// sudokuSolver.setTestProbables();
-
-		String inputFileName = null;
-		if (args.length != 0) {
-			inputFileName = args[0];
-		}
-		if (inputFileName == null || inputFileName.equals("")) {
-			System.err.println("Invalid input for file name");
-			System.exit(5);
-		}
-		solveFile(sudokuSolver, inputFileName);
-
-	}
-
-	private static void solveFile(SudokuSolver sudokuSolver, String inputFileName) {
-		sudokuSolver.readInputFromFile(inputFileName);
-		sudokuSolver.solve(true);
-	}
-
 	@SuppressWarnings("unchecked")
 	private void init() {
 		a = new int[9][9];
@@ -89,59 +63,6 @@ public class SudokuSolver {
 		p[i][j].add(N7);
 		p[i][j].add(N8);
 		p[i][j].add(N9);
-	}
-
-	private void readInputFromFile(String absPath) {
-		try {
-			File file = new File(absPath);
-			if (!file.exists()) {
-				System.err.println("File " + absPath + " not found");
-				System.exit(5);
-			}
-			if (!file.isFile()) {
-				System.err.println(absPath + " is not a proper file");
-				System.exit(5);
-			}
-			if (!file.canRead()) {
-				System.err.println(absPath + " is not readable file");
-				System.exit(5);
-			}
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String s;
-			int i = 0;
-			while ((s = br.readLine()) != null) {
-				if (s != null && s.length() != 0 && !s.equals("\n")) {
-					for (int j = 0; j < s.length() && j < 9 && i < 9; j++) {
-						char c = s.charAt(j);
-						if (c == ' ') {
-							c = '0';
-						}
-						a[i][j] = Integer.parseInt(String.valueOf(c));
-					}
-				}
-				i++;
-			}
-			fr.close();
-			printPuzzle();
-
-			if (!isValid()) {
-				// exitAsInvalid();
-				throw new RuntimeException("Invalid Input");
-			}
-
-		} catch (NumberFormatException e) {
-			System.err.println("Input file " + absPath + " has non-numeric characters");
-			System.exit(5);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(5);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(5);
-		}
 	}
 
 	private int[][] readInputFromStrArray(String[][] input) {
