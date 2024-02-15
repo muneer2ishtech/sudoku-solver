@@ -32,7 +32,6 @@ public class SudokuAltSolver {
 						.toArray(EnumSet[]::new))
 				.toArray(EnumSet[][]::new);
 		// @formatter:on
-		System.out.println(probs);
 	}
 
 	private boolean isValid() {
