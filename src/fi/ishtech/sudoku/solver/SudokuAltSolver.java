@@ -61,7 +61,7 @@ public class SudokuAltSolver {
 	}
 
 	private void resetProbables(int row, int col) {
-		if (input[row][col] != null) {
+		if (result[row][col] != null) {
 			probs[row][col].clear();
 		}
 	}
