@@ -95,16 +95,33 @@ public enum IntEnum {
 	}
 
 	public static void print(EnumSet<IntEnum>[][] setArray) {
-		// @formatter:off
-		Arrays.stream(setArray)
-				.map(row -> Arrays.stream(row)
-						.map(set -> set.stream().map(IntEnum::toString).toArray(String[]::new))
-						.toArray(String[][]::new))
-				.forEach(row -> {
-					Arrays.stream(row).forEach(set -> System.out.print(Arrays.toString(set) + " "));
-					System.out.println();
-				});
-		// @formatter:on
+		if (setArray == null) {
+			System.out.println(setArray);
+		} else {
+			int rows = setArray.length;
+			int cols = setArray[0].length;
+
+			StringBuilder sb = new StringBuilder();
+			sb.append('[');
+			for (int i = 0; i < rows; i++) {
+				sb.append("\n[");
+				for (int j = 0; j < cols; j++) {
+					sb.append(setArray[i][j]);
+					if (j == cols - 1) {
+						sb.append(']');
+					} else {
+						sb.append(',');
+					}
+				}
+				if (i == rows - 1) {
+					sb.append("\n]");
+				} else {
+					sb.append(",");
+				}
+			}
+
+			System.out.println(sb.toString());
+		}
 	}
 
 }
