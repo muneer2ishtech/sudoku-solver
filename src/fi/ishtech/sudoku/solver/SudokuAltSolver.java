@@ -19,7 +19,7 @@ public class SudokuAltSolver {
 		return IntEnum.toIntArray(input);
 	}
 
-	public IntEnum[][] readInputFromStrArray(String[][] input) {
+	private static IntEnum[][] readInputFromStrArray(String[][] input) {
 		return IntEnum.fromStringArray(input);
 	}
 
