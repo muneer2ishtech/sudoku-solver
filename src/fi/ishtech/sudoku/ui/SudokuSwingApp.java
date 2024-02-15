@@ -99,7 +99,7 @@ public class SudokuSwingApp extends JFrame {
 		String[][] inputArray = new String[9][9];
 
 		System.out.println("Input:");
-/*
+
 		// Read input values from UI
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
@@ -111,7 +111,6 @@ public class SudokuSwingApp extends JFrame {
 			}
 			System.out.println("");
 		}
-*/
 
 		try {
 			SudokuAltSolver sudokuAltSolver = new SudokuAltSolver(inputArray);
