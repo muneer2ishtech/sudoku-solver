@@ -47,6 +47,9 @@ public class SudokuAltSolver {
 	}
 
 	private boolean isResolved(boolean exitOnSolved) {
+		if (printLogs) {
+			printResultInt();
+		}
 		// TODO
 		return true;
 	}
