@@ -33,9 +33,7 @@ public class SudokuAltSolver {
 		printResultInt();
 		printProbablesInt();
 
-		resetProbables();
-
-		// TODO
+		solve(false);
 
 		return IntEnum.toIntArray(result);
 	}
