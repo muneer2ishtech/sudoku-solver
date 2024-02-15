@@ -1,5 +1,6 @@
 package fi.ishtech.sudoku.solver.enums;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,11 +82,11 @@ public enum IntEnum {
 	public static int[][] toIntArray(IntEnum[][] e) {
 		// @formatter:off
 		return (e == null) ? null :
-				IntStream.range(0, e.length)
-						.mapToObj(i -> IntStream.range(0, e[i].length)
-								.map(j -> e[i][j].getValue())
-								.toArray())
-						.toArray(int[][]::new);
+				Arrays.stream(e)
+					.map(row -> Arrays.stream(row)
+							.mapToInt(IntEnum::getValue)
+							.toArray())
+					.toArray(int[][]::new);
 		// @formatter:on
 	}
 
