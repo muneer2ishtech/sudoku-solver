@@ -19,12 +19,10 @@ public class SudokuAltSolver {
 		this(readInputFromStrArray(input));
 	}
 
-	public int[][] solve(String[][] input) {
-		return solve(readInputFromStrArray(input));
-	}
+	public int[][] solve() {
+		printProbables();
 
-	public int[][] solve(IntEnum[][] input) {
-		initProbables();
+		resetProbables();
 
 		// TODO
 
