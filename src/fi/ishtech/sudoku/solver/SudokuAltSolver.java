@@ -2,6 +2,7 @@ package fi.ishtech.sudoku.solver;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,6 +99,12 @@ public class SudokuAltSolver {
 
 		for (int j = 0; j < 9; j++) {
 			solveUniqProbableInColReverse(j);
+		}
+
+		for (int boxI = 0; boxI < 9; boxI += 3) {
+			for (int boxJ = 0; boxJ < 9; boxJ += 3) {
+				solveUniqProbableInBoxReverse(boxI, boxJ);
+			}
 		}
 
 		isResolved(exitOnSolved);
@@ -198,6 +205,41 @@ public class SudokuAltSolver {
 		for (int i = boxI; i < (boxI + 3); i++) {
 			for (int j = boxJ; j < (boxJ + 3); j++) {
 				solveUniqProbable(i, j);
+			}
+		}
+	}
+
+	private void solveUniqProbableInBoxReverse(int row, int col) {
+		Set<IntEnum> combined = new HashSet<IntEnum>();
+
+		int boxI = (row / 3) * 3;
+		int boxJ = (col / 3) * 3;
+		for (int i = boxI; i < (boxI + 3); i++) {
+			for (int j = boxJ; j < (boxJ + 3); j++) {
+				combined.addAll(probs[i][j]);
+			}
+		}
+
+		for (IntEnum e : combined) {
+			int count = 0;
+			int foundRow = -1;
+			int foundCol = -1;
+			for (int i = boxI; i < (boxI + 3); i++) {
+				for (int j = boxJ; j < (boxJ + 3); j++) {
+					if (probs[i][j].contains(e)) {
+						count++;
+						foundRow = i;
+						foundCol = j;
+					}
+				}
+			}
+
+			if (count == 1) {
+				// found only once
+				result[foundRow][foundCol] = e; // can you assign directly or need to do IntEnum.fromValue(e.getValue())
+				resetProbables(foundRow, foundCol);
+			} else {
+				// found more than once
 			}
 		}
 	}
