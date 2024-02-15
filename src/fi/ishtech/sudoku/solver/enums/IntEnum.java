@@ -2,9 +2,11 @@ package fi.ishtech.sudoku.solver.enums;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 public enum IntEnum {
 
@@ -62,6 +64,16 @@ public enum IntEnum {
 
 	public static int toInt(IntEnum e) {
 		return e == null ? 0 : e.getValue();
+	}
+
+	public static Set<Integer> toSetOfIntegers(EnumSet<IntEnum> es) {
+		Set<Integer> result = new HashSet<Integer>();
+
+		for (IntEnum e : es) {
+			result.add(e.getValue());
+		}
+
+		return result;
 	}
 
 }
