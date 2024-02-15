@@ -20,27 +20,10 @@ public class SudokuAltSolver {
 	}
 
 	public IntEnum[][] readInputFromStrArray(String[][] input) {
-		IntEnum[][] a = new IntEnum[9][9];
-
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				if (!input[i][j].trim().isEmpty()) {
-					try {
-						a[i][j] = IntEnum.fromValue(input[i][j]);
-					} catch (NoSuchElementException | NumberFormatException e) {
-						throw e;
-					} catch (Exception e) {
-						throw new RuntimeException(
-								"Invalid input '" + input[i][j] + "' at row:" + (i + 1) + ", col:" + (j + 1));
-					}
-				}
-			}
-		}
-		if (!isValid()) {
-			throw new RuntimeException("Invalid Input");
-		}
-
-		return a;
+		return input == null ? null
+				: IntStream.range(0, 9).mapToObj(i -> IntStream.range(0, 9)
+						.mapToObj(j -> IntEnum.fromValue(input[i][j])).toArray(IntEnum[]::new))
+						.toArray(IntEnum[][]::new);
 	}
 
 	@SuppressWarnings("unchecked")
