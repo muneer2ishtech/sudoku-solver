@@ -84,6 +84,7 @@ public class SudokuAltSolver {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isValid() {
 		// TODO
 
