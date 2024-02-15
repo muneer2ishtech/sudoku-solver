@@ -28,12 +28,13 @@ public class SudokuAltSolver {
 
 	@SuppressWarnings("unchecked")
 	private void initProbables() {
-		EnumSet<IntEnum>[][] probs = new EnumSet[9][9];
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				probs[i][j] = IntEnum.all();
-			}
-		}
+		// @formatter:off
+		EnumSet<IntEnum>[][] probs = IntStream.range(0, 9)
+				.mapToObj(i -> IntStream.range(0, 9)
+						.mapToObj(j -> IntEnum.all())
+						.toArray(EnumSet[]::new))
+				.toArray(EnumSet[][]::new);
+		// @formatter:on
 		System.out.println(probs);
 	}
 
