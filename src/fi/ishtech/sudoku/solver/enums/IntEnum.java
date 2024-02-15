@@ -78,6 +78,22 @@ public enum IntEnum {
 		return e == null ? 0 : e.getValue();
 	}
 
+	public static int[][] toIntArray(IntEnum[][] e) {
+		if (e == null) {
+			return null;
+		}
+
+		int[][] result = new int[e.length][e[0].length];
+
+		for (int i = 0; i < e.length; i++) {
+			for (int j = 0; j < e[i].length; i++) {
+				result[i][j] = e[i][j].getValue();
+			}
+		}
+
+		return result;
+	}
+
 	public static Set<Integer> toSetOfIntegers(EnumSet<IntEnum> es) {
 		return es == null ? null : es.stream().map(IntEnum::getValue).collect(Collectors.toSet());
 	}
