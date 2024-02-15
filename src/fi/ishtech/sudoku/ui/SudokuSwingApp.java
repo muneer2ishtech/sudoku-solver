@@ -17,7 +17,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
-import fi.ishtech.sudoku.solver.SudokuSolver;
+//import fi.ishtech.sudoku.solver.SudokuSolver;
 
 public class SudokuSwingApp extends JFrame {
 
@@ -112,9 +112,11 @@ public class SudokuSwingApp extends JFrame {
 		}
 
 		try {
+		/*
 			// Pass the 2D array to solver
 			SudokuSolver sudokuSolver = new SudokuSolver();
 			int[][] solvedArray = sudokuSolver.solve(inputArray);
+		*/
 
 			// Update the UI with the solved results
 			updateUI(solvedArray);
