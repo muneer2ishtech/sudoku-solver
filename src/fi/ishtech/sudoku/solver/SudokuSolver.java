@@ -144,7 +144,9 @@ public class SudokuSolver {
 		}
 	}
 
-	private void readInputFromStrArray(String[][] input) {
+	private int[][] readInputFromStrArray(String[][] input) {
+		int[][] a = new int[9][9];
+
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				if (!input[i][j].trim().isEmpty()) {
@@ -161,10 +163,15 @@ public class SudokuSolver {
 			throw new RuntimeException("Invalid Input");
 		}
 
+		return a;
 	}
 
 	public int[][] solve(String[][] input) {
-		readInputFromStrArray(input);
+		return solve(readInputFromStrArray(input));
+	}
+
+	public int[][] solve(int[][] input) {
+		a = input;
 		solve(false);
 		return a;
 	}
