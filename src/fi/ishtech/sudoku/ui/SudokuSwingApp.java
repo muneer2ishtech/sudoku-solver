@@ -99,7 +99,7 @@ public class SudokuSwingApp extends JFrame {
 		String[][] inputArray = new String[9][9];
 
 		System.out.println("Input:");
-
+/*
 		// Read input values from UI
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
@@ -111,6 +111,89 @@ public class SudokuSwingApp extends JFrame {
 			}
 			System.out.println("");
 		}
+*/
+
+		inputArray[0][0]="";
+		inputArray[0][1]="";
+		inputArray[0][2]="";
+		inputArray[0][3]="";
+		inputArray[0][4]="1";
+		inputArray[0][5]="6";
+		inputArray[0][6]="";
+		inputArray[0][7]="7";
+		inputArray[0][8]="";
+		inputArray[1][0]="";
+		inputArray[1][1]="2";
+		inputArray[1][2]="8";
+		inputArray[1][3]="";
+		inputArray[1][4]="";
+		inputArray[1][5]="";
+		inputArray[1][6]="1";
+		inputArray[1][7]="";
+		inputArray[1][8]="";
+		inputArray[2][0]="";
+		inputArray[2][1]="";
+		inputArray[2][2]="";
+		inputArray[2][3]="3";
+		inputArray[2][4]="";
+		inputArray[2][5]="";
+		inputArray[2][6]="";
+		inputArray[2][7]="6";
+		inputArray[2][8]="";
+		inputArray[3][0]="5";
+		inputArray[3][1]="";
+		inputArray[3][2]="7";
+		inputArray[3][3]="9";
+		inputArray[3][4]="";
+		inputArray[3][5]="";
+		inputArray[3][6]="";
+		inputArray[3][7]="";
+		inputArray[3][8]="";
+		inputArray[4][0]="";
+		inputArray[4][1]="";
+		inputArray[4][2]="1";
+		inputArray[4][3]="";
+		inputArray[4][4]="";
+		inputArray[4][5]="";
+		inputArray[4][6]="4";
+		inputArray[4][7]="";
+		inputArray[4][8]="";
+		inputArray[5][0]="";
+		inputArray[5][1]="";
+		inputArray[5][2]="";
+		inputArray[5][3]="";
+		inputArray[5][4]="";
+		inputArray[5][5]="1";
+		inputArray[5][6]="5";
+		inputArray[5][7]="";
+		inputArray[5][8]="9";
+		inputArray[6][0]="";
+		inputArray[6][1]="3";
+		inputArray[6][2]="";
+		inputArray[6][3]="";
+		inputArray[6][4]="";
+		inputArray[6][5]="5";
+		inputArray[6][6]="";
+		inputArray[6][7]="";
+		inputArray[6][8]="";
+		inputArray[7][0]="";
+		inputArray[7][1]="";
+		inputArray[7][2]="5";
+		inputArray[7][3]="";
+		inputArray[7][4]="";
+		inputArray[7][5]="";
+		inputArray[7][6]="7";
+		inputArray[7][7]="2";
+		inputArray[7][8]="";
+		inputArray[8][0]="";
+		inputArray[8][1]="9";
+		inputArray[8][2]="";
+		inputArray[8][3]="7";
+		inputArray[8][4]="8";
+		inputArray[8][5]="";
+		inputArray[8][6]="";
+		inputArray[8][7]="";
+		inputArray[8][8]="";
 
 		try {
 			SudokuAltSolver sudokuAltSolver = new SudokuAltSolver(inputArray);
