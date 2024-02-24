@@ -66,7 +66,7 @@ function resetProbablesBasedOnRowCol(row, col) {
 
         eliminateRowUnProbables(row, col);
         eliminateColUnProbables(row, col);
-        //eliminateBoxUnProbables(row, col);
+        eliminateBoxUnProbables(row, col);
     }
 }
 
@@ -83,8 +83,8 @@ function eliminateColUnProbables(row, col) {
 }
 
 function eliminateBoxUnProbables(row, col) {
-    let boxI = (row / 3) * 3;
-    let boxJ = (col / 3) * 3;
+    let boxI = parseInt(row / 3) * 3;
+    let boxJ = parseInt(col / 3) * 3;
     for (let i = boxI; i < (boxI + 3); i++) {
         for (let j = boxJ; j < (boxJ + 3); j++) {
             removeFromArray(probs[i][j], result[row][col]);
