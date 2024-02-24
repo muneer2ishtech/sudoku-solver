@@ -78,7 +78,7 @@ function eliminateRowUnProbables(row, col) {
 
 function eliminateColUnProbables(row, col) {
     for (let i = 0; i < 9; i++) {
-        removeFromArray([i][col], result[row][col]);
+        removeFromArray(probs[i][col], result[row][col]);
     }
 }
 
