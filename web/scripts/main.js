@@ -119,19 +119,3 @@ function solvePuzzle() {
     // output result
     outputResultMatrix(resultMatrix, inputMatrix);
 }
-
-function doSolveSoduku(inputMatrix) {
-    const resultMatrix = [];
-
-    for (let i = 0; i < 9; i++) {
-        resultMatrix[i] = [];
-        for (let j = 0; j < 9; j++) {
-            resultMatrix[i][j] = inputMatrix[i][j];
-        }
-    }
-    console.log("resultMatrix:" + resultMatrix);
-
-    resultMatrix[4][4] = 4;
-
-    return resultMatrix;
-}
