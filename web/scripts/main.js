@@ -104,7 +104,7 @@ function solvePuzzle() {
     const inputMatrix = readInputMatrix();
 
     // start timer
-    startTimer();
+    //startTimer();
 
     // solve
     resultMatrix = solveSoduku(inputMatrix);
@@ -114,7 +114,7 @@ function solvePuzzle() {
     }, 500000);
 
     // stop timer
-    stopTimer();
+    //stopTimer();
 
     // output result
     outputResultMatrix(resultMatrix, inputMatrix);
