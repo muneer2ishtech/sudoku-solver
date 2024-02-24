@@ -147,7 +147,7 @@ function solveUniqProbableInBox(row, col) {
 }
 
 function solveUniqProbable(row, col) {
-    if (! result[row][col]) {
+    if (!result[row][col]) {
         if (probs[row][col].length == 1) {
             result[row][col] = probs[row][col][0];
             probs[row][col].length = 0;
