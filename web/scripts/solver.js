@@ -48,6 +48,15 @@ function doSolve(exitOnSolved) {
 
 function isResolved(exitOnSolved) {
     console.log("try:" + tryc);
+
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            if (!result[i][j]) {
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -61,7 +70,6 @@ function resetProbables() {
 }
 
 function resetProbablesBasedOnRowCol(row, col) {
-    console.log("row:" + row + ", col:" + col);
     if (result[row][col]) {
         probs[row][col].length = 0;
 
