@@ -41,7 +41,7 @@ function doSolve(exitOnSolved) {
         resetProbables();
 
         solveUniqs(exitOnSolved);
-        //solveUniqProbablesInReverse(exitOnSolved);
+        solveUniqProbablesInReverse(exitOnSolved);
 
         tryc++;
     } while (!exitAfterMaxTry() && !isResolved(exitOnSolved));
@@ -176,4 +176,94 @@ function solveUniqProbable(row, col) {
             probs[row][col].length = 0;
         }
     }
+}
+
+function solveUniqProbablesInReverse(exitOnSolved) {
+    for (let i = 0; i < 9; i++) {
+        solveUniqProbableInRowReverse(i);
+    }
+
+    for (let j = 0; j < 9; j++) {
+        solveUniqProbableInColReverse(j);
+    }
+
+    for (let boxI = 0; boxI < 9; boxI += 3) {
+        for (let boxJ = 0; boxJ < 9; boxJ += 3) {
+            solveUniqProbableInBoxReverse(boxI, boxJ);
+        }
+    }
+
+    isResolved(exitOnSolved);
+}
+
+function solveUniqProbableInRowReverse(row) {
+    for (let n = 1; n <= 9; n++) {
+        let counter = 0;
+        let foundCol = 10;
+        for (let j = 0; j < 9; j++) {
+            if (probs[row][j].indexOf(n) > -1) {
+                foundCol = j;
+                counter++;
+            }
+        }
+        if (counter == 1) {
+            // n is present only once
+            setSolvedValue(row, foundCol, n);
+        }
+    }
+}
+
+function solveUniqProbableInColReverse(col) {
+    for (let n = 1; n <= 9; n++) {
+        let counter = 0;
+        let foundRow = 10;
+        for (let i = 0; i < 9; i++) {
+            if (probs[i][col].indexOf(n) > -1) {
+                foundRow = i;
+                counter++;
+            }
+        }
+        if (counter == 1) {
+            // n is present only once
+            setSolvedValue(foundRow, col, n);
+        }
+    }
+}
+
+function solveUniqProbableInBoxReverse(row, col) {
+    for (let n = 1; n <= 9; n++) {
+        let counter = 0;
+        let foundRow = 10;
+        let foundCol = 10;
+        let boxI = parseInt(row / 3) * 3;
+        let boxJ = parseInt(col / 3) * 3;
+        for (let i = boxI; i < (boxI + 3); i++) {
+            for (let j = boxJ; j < (boxJ + 3); j++) {
+                if (probs[i][j].indexOf(n) > -1) {
+                    foundRow = i;
+                    foundCol = j;
+                    counter++;
+                }
+            }
+        }
+        if (counter == 1) {
+            // n is present only once
+            setSolvedValue(foundRow, foundCol, n);
+        }
+    }
+}
+
+function isThisSolved(row, col) {
+    if (probs[row][col] && probs[row][col].length == 1) {
+        result[row][col] = probs[row][col][0];
+        probs[row][col].length = 0;
+
+        resetProbablesBasedOnRowCol(row, col);
+    }
+}
+
+function setSolvedValue(row, col, num) {
+    result[row][col] = num;
+    probs[row][col].length = 0;
+    resetProbablesBasedOnRowCol(row, col);
 }
