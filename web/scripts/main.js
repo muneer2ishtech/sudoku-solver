@@ -107,7 +107,7 @@ function solvePuzzle() {
     startTimer();
 
     // solve
-    resultMatrix = doSolveSoduku(inputMatrix);
+    resultMatrix = solveSoduku(inputMatrix);
 
     setTimeout(function () {
         console.log("...");
