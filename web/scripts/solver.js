@@ -110,12 +110,12 @@ function solveUniqs(exitOnSolved) {
     }
 
     for (let j = 0; j < 9; j++) {
-        //solveUniqInCol(j);
+        solveUniqInCol(j);
     }
 
     for (let boxI = 0; boxI < 9; boxI += 3) {
         for (let boxJ = 0; boxJ < 9; boxJ += 3) {
-            //solveUniqInBox(boxI, boxJ);
+            solveUniqInBox(boxI, boxJ);
         }
     }
 
