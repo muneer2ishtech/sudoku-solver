@@ -13,6 +13,7 @@ const probs = [
 const result = [];
 
 var tryc = 0;
+const maxTry = 10000;
 
 function initProabables() {
     console.log(probs);
@@ -43,7 +44,7 @@ function doSolve(exitOnSolved) {
         //solveUniqProbablesInReverse(exitOnSolved);
 
         tryc++;
-    } while (!isResolved(exitOnSolved));
+    } while (!exitAfterMaxTry() && !isResolved(exitOnSolved));
 }
 
 function isResolved(exitOnSolved) {
@@ -58,6 +59,10 @@ function isResolved(exitOnSolved) {
     }
 
     return true;
+}
+
+function exitAfterMaxTry() {
+    return tryc >= maxTry;
 }
 
 function resetProbables() {
