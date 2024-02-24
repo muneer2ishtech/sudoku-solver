@@ -1,0 +1,151 @@
+body {
+    margin: 0;
+    font-family: sans-serif, Arial;
+    font-size: 14px;
+}
+
+.puzzle-grid {
+    border-spacing: 0;
+    border-collapse: collapse;
+    background-color: #FFFFFF;
+    border-right: #666699 solid 2px;
+}
+
+.puzzle-grid td {
+    padding: 0;
+}
+
+.puzzle-cell {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    border-left: #DDDDEE solid 1px;
+    border-top: #DDDDEE solid 1px;
+}
+
+.puzzle-cell-left {
+    border-left: #666699 solid 2px;
+}
+
+.puzzle-cell-top {
+    border-top: #666699 solid 2px;
+}
+
+.puzzle-cell-bottom {
+    border-bottom: #666699 solid 2px;
+}
+
+.puzzle-input {
+    -webkit-appearance: none;
+    width: 28px;
+    margin: 0;
+    border: solid 0 #fff;
+    font-family: "lucida handwriting", "comic sans ms", sans-serif;
+    font-size: 16px;
+    text-align: center;
+    color: #7777DD;
+    background-color: transparent;
+    outline: none;
+}
+
+.vh-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.output-green {
+    color: #4CAF50;
+}
+
+.output-red {
+    color: #FF5733;
+}
+
+.timer-div {
+    margin-top: 1.5em;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.buttons-div {
+    margin-top: 1.5em;
+}
+
+.buttons {
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+    padding: 0.5em 1em;
+    border: 2px solid #DDDDFF;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #666699;
+    background-color: #DDDDFF;
+}
+
+.buttons:disabled {
+    color: #DDDDFF;
+    background-color: #EEEEFF;
+}
+
+@media (min-width: 481px) {
+    .buttons {
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    #puzzle_grid {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .puzzle-cell {
+        width: 19pt;
+        height: 20pt;
+    }
+
+    .puzzle-input {
+        width: 19pt;
+        font-size: 13pt;
+    }
+}
+
+@media (min-width:950px) and (min-height:720px) {
+    .puzzle-cell {
+        width: 30pt;
+        height: 31pt
+    }
+
+    .puzzle-input {
+        width: 30pt;
+        font-size: 20pt;
+    }
+}
+
+@media (min-width:1100px) and (min-height:820px) {
+    .puzzle-cell {
+        width: 36pt;
+        height: 37pt
+    }
+
+    .puzzle-input {
+        width: 36pt;
+        font-size: 24pt;
+    }
+}
+
+@media (min-width:1250px) and (min-height:920px) {
+    .puzzle-cell {
+        width: 42pt;
+        height: 43pt
+    }
+
+    .puzzle-input {
+        width: 42pt;
+        font-size: 28pt;
+    }
+}
