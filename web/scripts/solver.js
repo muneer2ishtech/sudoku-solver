@@ -86,13 +86,23 @@ function resetProbablesBasedOnRowCol(row, col) {
 
 function eliminateRowUnProbables(row, col) {
     for (let j = 0; j < 9; j++) {
+        if (j == col) {
+            continue;
+        }
+        tryc++;
         removeFromArray(probs[row][j], result[row][col]);
+        isThisSolved(row, j);
     }
 }
 
 function eliminateColUnProbables(row, col) {
     for (let i = 0; i < 9; i++) {
+        if (i == row) {
+            continue;
+        }
+        tryc++;
         removeFromArray(probs[i][col], result[row][col]);
+        isThisSolved(i, col);
     }
 }
 
@@ -101,7 +111,12 @@ function eliminateBoxUnProbables(row, col) {
     let boxJ = parseInt(col / 3) * 3;
     for (let i = boxI; i < (boxI + 3); i++) {
         for (let j = boxJ; j < (boxJ + 3); j++) {
+            if (i == row && j == col) {
+                continue;
+            }
+            tryc++;
             removeFromArray(probs[i][j], result[row][col]);
+            isThisSolved(i, j);
         }
     }
 }
