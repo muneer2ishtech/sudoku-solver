@@ -110,7 +110,7 @@ function solveUniqs(exitOnSolved) {
     }
 
     for (let j = 0; j < 9; j++) {
-        //solveUniqInCol(j);
+        solveUniqInCol(j);
     }
 
     for (let boxI = 0; boxI < 9; boxI += 3) {
@@ -120,6 +120,16 @@ function solveUniqs(exitOnSolved) {
     }
 
     isResolved(exitOnSolved);
+}
+
+function solveUniqInCol(col) {
+    solveUniqProbableInCol(col);
+}
+
+function solveUniqProbableInCol(col) {
+    for (let i = 0; i < 9; i++) {
+        solveUniqProbable(i, col);
+    }
 }
 
 function solveUniqInBox(row, col) {
