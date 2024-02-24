@@ -39,7 +39,7 @@ function doSolve(exitOnSolved) {
     do {
         resetProbables();
 
-        //solveUniqs(exitOnSolved);
+        solveUniqs(exitOnSolved);
         //solveUniqProbablesInReverse(exitOnSolved);
 
         tryc++;
@@ -47,6 +47,7 @@ function doSolve(exitOnSolved) {
 }
 
 function isResolved(exitOnSolved) {
+    console.log("try:" + tryc);
     return true;
 }
 
@@ -103,3 +104,43 @@ function removeFromArray(arr, val) {
     }
 }
 
+function solveUniqs(exitOnSolved) {
+    for (let i = 0; i < 9; i++) {
+        //solveUniqInRow(i);
+    }
+
+    for (let j = 0; j < 9; j++) {
+        //solveUniqInCol(j);
+    }
+
+    for (let boxI = 0; boxI < 9; boxI += 3) {
+        for (let boxJ = 0; boxJ < 9; boxJ += 3) {
+            solveUniqInBox(boxI, boxJ);
+        }
+    }
+
+    isResolved(exitOnSolved);
+}
+
+function solveUniqInBox(row, col) {
+    solveUniqProbableInBox(row, col);
+}
+
+function solveUniqProbableInBox(row, col) {
+    let boxI = parseInt(row / 3) * 3;
+    let boxJ = parseInt(col / 3) * 3;
+    for (let i = boxI; i < (boxI + 3); i++) {
+        for (let j = boxJ; j < (boxJ + 3); j++) {
+            solveUniqProbable(i, j);
+        }
+    }
+}
+
+function solveUniqProbable(row, col) {
+    if (! result[row][col]) {
+        if (probs[row][col].length == 1) {
+            result[row][col] = probs[row][col][0];
+            probs[row][col].length = 0;
+        }
+    }
+}
