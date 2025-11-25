@@ -30,5 +30,5 @@ function formatTime(elapsedTime) {
 }
 
 function padNumber(number, length = 2) {
-    return ('0' + number).slice(-length);
+    return ('00' + number).slice(-length);
 }
