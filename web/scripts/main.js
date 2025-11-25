@@ -1,4 +1,5 @@
 function newPuzzle() {
+    resetSolverMessage();
     resetTimer();
     clearAndEnableInputs();
     enableSolveButton();
@@ -47,6 +48,18 @@ function toggleButton(id, disabled) {
     } else {
         button.classList.remove("disabled");
     }
+}
+
+function resetSolverMessage() {
+    const messageDiv = document.getElementById("solverMessage");
+    messageDiv.innerText = "";
+    messageDiv.classList.remove('error-message', 'success-message');
+}
+
+function showSolverMessage(message, type) {
+    const messageDiv = document.getElementById("solverMessage");
+    messageDiv.innerText = message || "";
+    messageDiv.className = type || "";
 }
 
 function resetInputStyles(inputElement) {

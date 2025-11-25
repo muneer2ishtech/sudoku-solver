@@ -55,11 +55,17 @@ function isResolved(exitOnSolved) {
         }
     }
 
+    showSolverMessage(`Solved in ${tryc} tries.`, 'success-message');
     return true;
 }
 
 function exitAfterMaxTry() {
-    return tryc >= maxTry;
+    if (tryc >= maxTry) {
+      showSolverMessage(`Failed to solve Sudoku after ${tryc} tries.`, 'error-message');
+      return true;
+    }
+
+    return false;
 }
 
 function resetProbables() {
