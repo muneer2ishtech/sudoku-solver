@@ -15,13 +15,8 @@ const result = [];
 var tryc = 0;
 const maxTry = 10000;
 
-function initProabables() {
-    console.log(probs);
-}
-
 function solveSoduku(inputMatrix) {
     console.log(inputMatrix);
-    //initProabables();
     for (let i = 0; i < 9; i++) {
         result[i] = [];
         for (let j = 0; j < 9; j++) {
