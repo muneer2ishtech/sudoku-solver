@@ -104,13 +104,13 @@ function solvePuzzle() {
     const inputMatrix = readInputMatrix();
 
     // start timer
-    //startTimer();
+    startTimer();
 
     // solve
     resultMatrix = solveSoduku(inputMatrix);
 
     // stop timer
-    //stopTimer();
+    stopTimer();
 
     // output result
     outputResultMatrix(resultMatrix, inputMatrix);
