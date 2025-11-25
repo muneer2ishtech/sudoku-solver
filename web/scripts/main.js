@@ -106,12 +106,15 @@ function solvePuzzle() {
     // start timer
     startTimer();
 
-    // solve
-    resultMatrix = solveSoduku(inputMatrix);
+    // Use setTimeout to allow timer to update UI before solving
+    setTimeout(() => {
+        // solve
+        const resultMatrix = solveSoduku(inputMatrix);
 
-    // stop timer
-    stopTimer();
+        // stop timer
+        stopTimer();
 
-    // output result
-    outputResultMatrix(resultMatrix, inputMatrix);
+        // output result
+        outputResultMatrix(resultMatrix, inputMatrix);
+    }, 10);
 }
