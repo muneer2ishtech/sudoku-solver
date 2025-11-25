@@ -16,7 +16,8 @@ var tryc = 0;
 const maxTry = 10000;
 
 function solveSoduku(inputMatrix) {
-    console.log(inputMatrix);
+    console.log("input:", inputMatrix);
+
     for (let i = 0; i < 9; i++) {
         result[i] = [];
         for (let j = 0; j < 9; j++) {
@@ -24,9 +25,10 @@ function solveSoduku(inputMatrix) {
         }
     }
 
-    console.log(result);
-
     doSolve(false);
+
+    console.log("result:", result);
+    console.log("tries:", tryc);
 
     return result;
 }
@@ -43,7 +45,7 @@ function doSolve(exitOnSolved) {
 }
 
 function isResolved(exitOnSolved) {
-    console.log("try:" + tryc);
+    //console.log("try:" + tryc);
 
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -66,7 +68,7 @@ function resetProbables() {
             resetProbablesBasedOnRowCol(i, j);
         }
     }
-    console.log(probs);
+    //console.log(probs);
 }
 
 function resetProbablesBasedOnRowCol(row, col) {

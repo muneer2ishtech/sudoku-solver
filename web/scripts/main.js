@@ -68,7 +68,7 @@ function readInputMatrix() {
             inputMatrix[i][j] = inputValue !== '' ? parseInt(inputValue) : 0;
         }
     }
-    console.log("inputmatirx:" + inputMatrix);
+    console.log("inputMatrix:", inputMatrix);
 
     return inputMatrix;
 }
