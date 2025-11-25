@@ -31,7 +31,7 @@ function enableSolveButton() {
     toggleButton("solve-button", false);
 }
 
-function diableResetButton() {
+function disableResetButton() {
     toggleButton("reset-button", true);
 }
 
