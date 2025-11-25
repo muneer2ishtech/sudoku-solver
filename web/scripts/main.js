@@ -51,7 +51,7 @@ function toggleButton(id, disabled) {
 
 function resetInputStyles(inputElement) {
     // Reset classes
-    inputElement.classList.remove('output-red', 'output-green');
+    inputElement.classList.remove('output-red', 'output-green', 'output-blue');
 }
 
 function validateInput(input) {
@@ -87,7 +87,7 @@ function outputResultMatrix(resultMatrix, inputMatrix) {
 
             // Add classes for styling
             if (resultValue == inputValue) {
-                inputElement.classList.add('output-red');
+                inputElement.classList.add('output-blue');
             } else {
                 inputElement.classList.add('output-green');
             }
